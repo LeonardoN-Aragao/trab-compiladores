@@ -1,6 +1,8 @@
 #ifndef LEXIC_H
 #define LEXIC_H
 
-void lexicalAnalyzer();
+void clearLexeme(char* lexeme);
+
+void lexicalAnalyzer(char *text);
 
 #endif /* LEXIC_H */
