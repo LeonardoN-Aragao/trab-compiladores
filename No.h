@@ -1,19 +1,29 @@
 #ifndef NO_H_INCLUDED
 #define NO_H_INCLUDED
-
-/// ESSE AQUI É O ENTTAB
+#include <string>
+#include <iostream>
+#include <cstdlib>
+using namespace std;
 class No
 {
 private:
-    int info; /// valor armazenado no No
+    int token; /// valor armazenado no No
+    string key;
     No *prox; /// ponteiro para o proximo No
-    char *key;
+
 public:
-    No()                  { };
-    ~No()                 { };
-    int getInfo()         { return info; };
-    No* getProx()         { return prox; };
-    void setInfo(int val) { info = val; };
-    void setProx(No *p)   { prox = p; };
+    No(int token, string key, No *prox)
+    {
+        this->token = token;
+        this->key = key;
+        this->prox = prox;
+    };
+    ~No(){};
+    string getKey() { return key; };
+    int getToken() { return token; };
+    No *getProx() { return prox; };
+    void setKey(string val) { key = val; };
+    void setToken(int val) { token = val; };
+    void setProx(No *p) { prox = p; };
 };
 #endif // NO_H_INCLUDED

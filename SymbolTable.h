@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "NoTab.h"
+#include "No.h"
 #include "ListaEncad.h"
 
 typedef std::string string;
@@ -12,16 +12,14 @@ class TabelaHash
 {
 public:
     TabelaHash(int tam);
-    int getTam() { return tam; }
-    void insere(No* n);
+    void insere(string key);
     void print();
-    void insereArtists(int tam, string arq4, int M, int op);
 
 private:
     int tam;
     int ocupacao;
-    int funct(string, int);
-    ListaEncad** tabela;
+    int hashFunction(string);
+    ListaEncad **tabela;
 };
 
 
