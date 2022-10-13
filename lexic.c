@@ -1,5 +1,5 @@
 #include "lexic.h"
-
+#include "errorManager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,19 +13,30 @@ void insertLexicData(char* token, char* lexeme, lexicData* val, int i) {
    val->token = token;
 }
 
+void insertLexicDataWithErro(char* token, char* lexeme, lexicData* val, int i, int error) {
+   val->pos = i;
+   val->lexeme = lexeme;
+   val->token = token;
+   val->erro = error;
+}
+
+
 void clearLexeme(char* lexeme) {
    for(int i = 0; lexeme[i]; i++) {
       lexeme[i] = '\0';
    }
 }
-// void lexicalAnalyzer(char *text){
+
 lexicData lexicalAnalyzer(char *text, lexicData val) {
    char *lexeme = (char*)malloc(512*sizeof(char));
    char c;
    char *token;
    int state = 0;
+   errorManager error;
    int i = val.pos;
-   while(text[i] != EOF) {
+
+   int done = 0;
+   while(done == 0) {
       c = text[i];
       switch (state) {
       case 0:
@@ -164,7 +175,6 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             i++;
          } else {
             state = 37;
-            // i++;
          }
       case 4:
          if(c == '&') {
@@ -173,7 +183,6 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             i++;
          } else {
             state = 34;
-            // i++;
          }
          break;
       case 5:
@@ -186,25 +195,21 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
          }
          break;
       case 6:
-         // printf("lbrackets: %s\n", lexeme);
          token = "lbrackets";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 7:
-         // printf("asterisk: %s\n", lexeme);
          token = "asterisk";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 9:
-         // printf("lparent: %s\n", lexeme);
          token = "lparent";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 10:
-         // printf("comma: %s\n", lexeme);
          token = "comma";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -219,31 +224,26 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
          }
          break;
       case 12:
-         // printf("colon: %s\n", lexeme);
          token = "colon";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 13:
-         // printf("rparent: %s\n", lexeme);
          token = "rparent";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 14:
-         // printf("rbraces: %s\n", lexeme);
          token = "rbraces";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 15:
-         // printf("percent: %s\n", lexeme);
          token = "percent";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 16:
-         // printf("lbraces: %s\n", lexeme);
          token = "lbraces";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -266,19 +266,16 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             state = 48;
          }
       case 19:
-         // printf("plus: %s\n", lexeme);
          token = "plus";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 20:
-         // printf("rbrackets: %s\n", lexeme);
          token = "rbrackets";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 21:
-         // printf("backslash: %s\n", lexeme);
          token = "backslash";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -302,91 +299,76 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
          }
          break;
       case 24:
-         // printf("arrow: %s\n", lexeme);
          token = "arrow";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 25:
-         // printf("equal: %s\n", lexeme);
          token = "equal";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 26:
-         // printf("or: %s\n", lexeme);
          token = "or";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 27:
-         // printf("and: %s\n", lexeme);
          token = "and";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 28:
-         // printf("greaterOrEqual: %s\n", lexeme);
          token = "greaterOrEqual";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 29:
-         // printf("notEqual: %s\n", lexeme);
          token = "notEqual";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 30:
-         // printf("lessOrEqual: %s\n", lexeme);
          token = "lessOrEqual";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 31:
-         // printf("semicolon: %s\n", lexeme);
          token = "semicolon";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 32:
-         // printf("exclamation: %s\n", lexeme);
          token = "exclamation";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 33:
-         // printf("assing: %s\n", lexeme);
          token = "assing";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 34:
-         // printf("ampersand: %s\n", lexeme);
          token = "ampersand";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 35:
-         // printf("great: %s\n", lexeme);
          token = "great";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 36:
-         // printf("minus: %s\n", lexeme);
          token = "minus";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 37:
-         // printf("verticalPipe: %s\n", lexeme);
          token = "verticalPipe";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 38:
-         // printf("less: %s\n", lexeme);
          token = "less";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -414,7 +396,6 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
          }
          break;
       case 41:
-         // printf("numInt: %s\n", lexeme);
          token = "numInt";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -442,7 +423,6 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             state = 45;
             i++;
          }
-         break;
       case 45:
          if(c >= '0' && c <= '9') {
             strncat(lexeme, &c, 1);
@@ -453,7 +433,10 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
          }
          break;
       case 46:
-         printf("Error Unexpected end of file");
+         error = createError(1, "Unexpected end of file");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          break;
       case 47:
          if(c >= '0' && c <= '9') {
@@ -464,10 +447,12 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             state = 52;
          }
       case 48:
-         printf("Error Invalid escape character");
+         error = createError(2, "Invalid escape character");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          break;
       case 49:
-         // printf("Literal: %s\n", lexeme);
          token = "LITERAL";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -504,16 +489,21 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
          }
          break;
       case 52:
-         // printf("numFloat: %s\n", lexeme);
          token = "numFloat";
          insertLexicData(token, lexeme, &val, i);
          return val;
          break;
       case 53:
-         printf("Erro Invalid Number");
+         error = createError(3, "Invalid Number");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          break;
       case 54:
-         printf("Erro Invalid Number");
+         error = createError(4, "Invalid Number");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          break;
       case 55:
          if(c == '/') {
@@ -538,7 +528,11 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             state = 49;
             i++;
          } else {
-            printf("Erro Invalid escape character");
+
+            error = createError(5, "Invalid escape character");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          }
       case 58:
          if(c == '/') {
@@ -549,11 +543,10 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             state = 61;
          }
       case 59:
-         printf("Erro Invalid escape character");
-         // fprintf(stderr, RED "[ERROR]"
-         //       NC  ": No string argument provided! \n"
-         //           "You must provide a program path as argument\n");
-         // return val;
+         error = createError(6, "Invalid escape character");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          continue;
          break;
       case 60:
@@ -569,10 +562,12 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             i++;
          }
       case 61:
-         printf("Erro Unexpected end of file in comment statement");
+         error = createError(7, "Unexpected end of file in comment statement");
+         printError(error);
+         insertLexicDataWithErro(token, lexeme, &val, i, 1);
+         return val;
          break;
       case 62:
-         // printf("Comment: %s\n", lexeme);
          token = "Comment";
          insertLexicData(token, lexeme, &val, i);
          return val;
@@ -594,7 +589,6 @@ lexicData lexicalAnalyzer(char *text, lexicData val) {
             i++;
          }
       case 65:
-         // printf("slash: %s\n", lexeme);
          token = "slash";
          insertLexicData(token, lexeme, &val, i);
          return val;
