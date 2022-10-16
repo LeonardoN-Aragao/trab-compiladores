@@ -120,19 +120,8 @@ HashTable::HashTable(int tam)
     }
 }
 
-// int HashTable::hashFunction(string key)
-// {
-//     int result = 0;
-//     for (size_t i = 0; i < key.length(); ++i)
-//     {
-//         result += key[i] * pow(13, i);
-//     }
-//     cout << "o result: " << fabs(result) << endl;
-//     return 30;
-//     return 3;
-// }
 
-int converteId(string id)
+int convertStringToInteger(string id)
 {
     int soma = 0;
     for (int i = 0; i < id.length(); i++)
@@ -144,9 +133,10 @@ int converteId(string id)
 
 int HashTable::hashFunction(string key)
 {
-    int intId = converteId(key);
-    int k = intId % tam;
-    return k;
+    double C = 0.6180339887;
+    int intKey = convertStringToInteger(key);
+    int i = tam * fmod((C * intKey), 1);
+    return i;
 }
 
 void HashTable::insert(string key)
