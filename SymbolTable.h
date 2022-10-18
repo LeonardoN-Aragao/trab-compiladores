@@ -8,27 +8,27 @@
 typedef std::string string;
 using namespace std;
 
-class No
+class SymbEntry
 {
 private:
-    int token; /// valor armazenado no No
+    int token; /// valor armazenado SymbEntry SymbEntry
     string key;
-    No *prox; /// ponteiro para o proximo No
+    SymbEntry *prox; /// ponteiro para o proximo SymbEntry
 
 public:
-    No(int token, string key, No *prox)
+    SymbEntry(int token, string key, SymbEntry *prox)
     {
         this->token = token;
         this->key = key;
         this->prox = prox;
     };
-    ~No(){};
+    ~SymbEntry(){};
     string getKey() { return key; };
     int getToken() { return token; };
-    No *getProx() { return prox; };
+    SymbEntry *getProx() { return prox; };
     void setKey(string val) { key = val; };
     void setToken(int val) { token = val; };
-    void setProx(No *p) { prox = p; };
+    void setProx(SymbEntry *p) { prox = p; };
 };
 
 class LinkedList
@@ -37,22 +37,24 @@ public:
     LinkedList();
     ~LinkedList();
     int get(int k);           /// retorna o valor do k-�simo elemento
-    void insereFinal(No *p);  /// insere um novo No contendo val no final da lista
-    void removeInicio();      /// remove o first No da lista
-    void removeFinal();       /// remove o �ltimo No da lista
+    void insereFinal(SymbEntry *p);  /// insere um SymbEntryvo SymbEntry contendo val SymbEntry final da lista
+    void removeInicio();      /// remove o first SymbEntry da lista
+    void removeFinal();       /// remove o �ltimo SymbEntry da lista
     void print();
 
 private:
-    No *first; /// ponteiro para o first No da lista
-    No *last;   /// ponteiro para o last No da lista
-    int n;        /// numero de nos na lista
+    SymbEntry *first; /// ponteiro para o first SymbEntry da lista
+    SymbEntry *last;   /// ponteiro para o last SymbEntry da lista
+    int n;        /// numero de SymbEntrys na lista
 };
 
 class HashTable
 {
 public:
     HashTable(int tam);
-    void insert(string key);
+    SymbEntry* insert(char* key, int token);
+    void insert(char* key, SymbEntry* info);
+    void insert(string key); // jeito que ele reclamou
     void print();
 
 private:

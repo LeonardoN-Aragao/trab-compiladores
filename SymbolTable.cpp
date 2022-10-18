@@ -20,10 +20,10 @@ LinkedList::LinkedList()
 LinkedList::~LinkedList()
 {
     cout << "Destruindo objeto LinkedList" << endl;
-    No *p = first;
+    SymbEntry *p = first;
     while (p != NULL)
     {
-        No *t = p->getProx();
+        SymbEntry *t = p->getProx();
         delete p;
         p = t;
     }
@@ -31,7 +31,7 @@ LinkedList::~LinkedList()
 
 void LinkedList::print()
 {
-    No *p;
+    SymbEntry *p;
     for (p = first; p != NULL; p = p->getProx())
         cout << "-> "
              << "(" << (p->getToken()) << ", " << p->getKey() << ")";
@@ -39,7 +39,7 @@ void LinkedList::print()
 
 int LinkedList::get(int k)
 {
-    No *p = first;
+    SymbEntry *p = first;
     int i = 0;
     while (i < k && p != NULL)
     {
@@ -56,7 +56,7 @@ int LinkedList::get(int k)
 }
 
 
-void LinkedList::insereFinal(No *p)
+void LinkedList::insereFinal(SymbEntry *p)
 {
     if (last != NULL)
         last->setProx(p);
@@ -70,7 +70,7 @@ void LinkedList::insereFinal(No *p)
 
 void LinkedList::removeInicio()
 {
-    No *p;
+    SymbEntry *p;
     if (first != NULL)
     {
         p = first;
@@ -87,7 +87,7 @@ void LinkedList::removeInicio()
 
 void LinkedList::removeFinal()
 {
-    No *p;
+    SymbEntry *p;
     if (last != NULL)
     {
         if (first == last)
@@ -144,7 +144,7 @@ void HashTable::insert(string key)
     int index;
     index = hashFunction(key);
     cout << "indice: " << index << endl;
-    No *p = new No(index, key, NULL);
+    SymbEntry *p = new SymbEntry(index, key, NULL);
     table[index]->insereFinal(p);
     cout << "inseriu" << endl;
 }
