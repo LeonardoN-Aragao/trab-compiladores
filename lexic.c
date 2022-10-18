@@ -7,7 +7,35 @@
 #define RED "\e[0;31m"
 #define NC "\e[0m"
 
-char *nextToken(char text, char *lexeme)
+struct lexical
+{                // actual definition of the struct, local to lexical.c
+   char *lexeme; // private variable
+};
+
+lexical *lexical_construct()
+{
+   lexical *obj;
+   obj = (lexical *)malloc(sizeof(lexical));
+   if (obj == NULL)
+   {
+      printf("Error creating lexical analyzer");
+   }
+   obj->lexeme = (char *)malloc(512 * sizeof(char));
+   return obj;
+}
+
+lexical *lexical_destruct(lexical *obj)
+{
+   free(obj);
+   return NULL;
+}
+
+char *getLexeme(lexical *obj)
+{
+   return obj->lexeme;
+}
+
+char *nextToken(lexical *obj, char text)
 {
    char c;
    char *token;
@@ -24,138 +52,138 @@ char *nextToken(char text, char *lexeme)
          if (c == '-')
          {
             state = 1;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '=')
          {
             state = 2;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '|')
          {
             state = 3;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '&')
          {
             state = 4;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '>')
          {
             state = 5;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '[')
          {
             state = 6;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '*')
          {
             state = 7;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '(')
          {
             state = 9;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == ',')
          {
             state = 10;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '!')
          {
             state = 11;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == ':')
          {
             state = 12;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == ')')
          {
             state = 13;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '}')
          {
             state = 14;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '%')
          {
             state = 15;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '{')
          {
             state = 16;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '.')
          {
             state = 17;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '+')
          {
             state = 19;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == ']')
          {
             state = 20;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '\\')
          {
             state = 21;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '>')
          {
             state = 22;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
          {
             state = 23;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == ';')
          {
             state = 31;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c >= '0' && c <= '9')
          {
             state = 40;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '\"')
          {
             state = 50;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '/')
          {
             state = 51;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          else if (c == '\'')
          {
             state = 55;
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
          }
          break;
       case 1:
          if (c == '>')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 24;
          }
          else
@@ -166,7 +194,7 @@ char *nextToken(char text, char *lexeme)
       case 2:
          if (c == '=')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 25;
          }
          else
@@ -177,7 +205,7 @@ char *nextToken(char text, char *lexeme)
       case 3:
          if (c == '|')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 26;
          }
          else
@@ -187,7 +215,7 @@ char *nextToken(char text, char *lexeme)
       case 4:
          if (c == '&')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 27;
          }
          else
@@ -198,7 +226,7 @@ char *nextToken(char text, char *lexeme)
       case 5:
          if (c == '=')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 28;
          }
          else
@@ -229,7 +257,7 @@ char *nextToken(char text, char *lexeme)
       case 11:
          if (c == '=')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 29;
          }
          else
@@ -265,7 +293,7 @@ char *nextToken(char text, char *lexeme)
       case 17:
          if (c >= '0' && c <= '9')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 43;
          }
          else
@@ -276,7 +304,7 @@ char *nextToken(char text, char *lexeme)
       case 18:
          if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 50;
          }
          else
@@ -301,7 +329,7 @@ char *nextToken(char text, char *lexeme)
       case 22:
          if (c == '=')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 30;
          }
          else
@@ -312,7 +340,7 @@ char *nextToken(char text, char *lexeme)
       case 23:
          if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 23;
          }
          else
@@ -403,17 +431,17 @@ char *nextToken(char text, char *lexeme)
       case 40:
          if (c >= '0' && c <= '9')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 40;
          }
          else if (c == 'e' || c == 'E')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 44;
          }
          else if (c == '.')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 43;
          }
          else
@@ -429,12 +457,12 @@ char *nextToken(char text, char *lexeme)
       case 43:
          if (c >= '0' && c <= '9')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 43;
          }
          else if (c == 'e' || c == 'E')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 44;
          }
          else
@@ -445,18 +473,18 @@ char *nextToken(char text, char *lexeme)
       case 44:
          if (c >= '0' && c <= '9')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 47;
          }
          else if (c == '+' || c == '-')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 45;
          }
       case 45:
          if (c >= '0' && c <= '9')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 47;
          }
          else
@@ -473,7 +501,7 @@ char *nextToken(char text, char *lexeme)
       case 47:
          if (c >= '0' && c <= '9')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 47;
          }
          else
@@ -494,12 +522,12 @@ char *nextToken(char text, char *lexeme)
       case 50:
          if (c == '\"')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 49;
          }
          else if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 18;
          }
          else if (c == EOF)
@@ -508,24 +536,24 @@ char *nextToken(char text, char *lexeme)
          }
          else
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 50;
          }
          break;
       case 51:
          if (c == '*')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 60;
          }
          else if (c == '/')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 63;
          }
          else
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 50;
          }
          break;
@@ -549,26 +577,26 @@ char *nextToken(char text, char *lexeme)
       case 55:
          if (c == '/')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 49;
          }
          else
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 59;
          }
          break;
       case 56:
          if (c == '\'')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 49;
          }
          break;
       case 57:
          if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 49;
          }
          else
@@ -581,7 +609,7 @@ char *nextToken(char text, char *lexeme)
       case 58:
          if (c == '/')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 49;
          }
          else if (c == EOF)
@@ -598,7 +626,7 @@ char *nextToken(char text, char *lexeme)
       case 60:
          if (c == '*')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 58;
          }
          else if (c == EOF)
@@ -607,7 +635,7 @@ char *nextToken(char text, char *lexeme)
          }
          else
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 60;
          }
       case 61:
@@ -624,18 +652,18 @@ char *nextToken(char text, char *lexeme)
       case 63:
          if (c == '/')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 64;
          }
          else
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 63;
          }
       case 64:
          if (c == '/')
          {
-            strncat(lexeme, &c, 1);
+            strncat(obj->lexeme, &c, 1);
             state = 62;
          }
       case 65:

@@ -1,12 +1,11 @@
 #ifndef LEXIC_H
 #define LEXIC_H
 
+typedef struct lexical lexical; // forward declaration of incomplete type
 
-typedef struct lexicData {
-        char* lexeme;
-
-} lexicData;
-
-char* nextToken(char text, char* lexeme);
+lexical *lexical_construct();
+lexical *lexical_destruct(lexical *obj);
+char *nextToken(lexical *obj, char text);
+char *getLexeme(lexical *obj);
 
 #endif /* LEXIC_H */

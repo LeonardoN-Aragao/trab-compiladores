@@ -24,7 +24,7 @@ int main()
 
    while (fread(&initialBuffer, sizeof *initialBuffer, bufferSize, pf) > 1)
    {
-      lexicData lexic;
+      lexical *x = lexical_construct();
       char *token;
       int tam = 0;
 
@@ -32,14 +32,13 @@ int main()
       {
          printf("char %c \n", initialBuffer[tam]);
          char teste = initialBuffer[tam];
-         char *lexeme = (char *)malloc(512 * sizeof(char));
-         token = nextToken(teste, lexeme);
+         token = nextToken(x, teste);
          tam++;
 
          if (token)
          {
             printf("O TOKEN: %s \n", token);
-            printf("lexema %s \n", lexeme);
+            // printf("lexema %s \n", lexeme);
          }
          else
             continue;
