@@ -3,7 +3,8 @@
 
 typedef struct lexical lexical; // forward declaration of incomplete type
 
-lexical *lexical_construct();
+lexical *lexical_construct(
+    char* reservedWordsOflanguage[] );
 lexical *lexical_destruct(lexical *obj);
 char *nextToken(lexical *obj, char text);
 char *getLexeme(lexical *obj);

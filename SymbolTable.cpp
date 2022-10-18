@@ -8,6 +8,7 @@
 #include <math.h>
 #include <cstdlib>
 using namespace std;
+#define SIZE    39
 
 LinkedList::LinkedList()
 {
@@ -110,11 +111,10 @@ void LinkedList::removeFinal()
         cout << "ERRO: lista vazia!" << endl;
 }
 
-HashTable::HashTable(int tam)
+HashTable::HashTable()
 {
-    this->tam = tam;
-    table = (LinkedList **)malloc(sizeof(LinkedList *) * tam);
-    for (int i = 0; i < tam; i++)
+    table = (LinkedList **)malloc(sizeof(LinkedList *) * SIZE);
+    for (int i = 0; i < SIZE; i++)
     {
         table[i] = new LinkedList();
     }
@@ -135,23 +135,31 @@ int HashTable::hashFunction(string key)
 {
     double C = 0.6180339887;
     int intKey = convertStringToInteger(key);
-    int i = tam * fmod((C * intKey), 1);
+    int i = SIZE * fmod((C * intKey), 1);
     return i;
 }
 
-void HashTable::insert(string key)
+void ReservedWord::insert(string key)
 {
-    int index;
-    index = hashFunction(key);
+    int index = hashFunction(key);
     cout << "indice: " << index << endl;
     SymbEntry *p = new SymbEntry(index, key, NULL);
     table[index]->insereFinal(p);
     cout << "inseriu" << endl;
 }
 
+void IdentifierOrLiteral::insert(string key)
+{
+    int index = hashFunction(key);
+    cout << "indice: " << index << endl;
+    SymbEntry *p = new SymbEntry(key, NULL);
+    table[index]->insereFinal(p);
+    cout << "inseriu" << endl;
+}
+
 void HashTable::print()
 {
-    for (int i = 0; i < tam; i++)
+    for (int i = 0; i < SIZE; i++)
     {
         cout << i << " ";
         table[i]->print();

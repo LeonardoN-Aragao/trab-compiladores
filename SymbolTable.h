@@ -22,6 +22,11 @@ public:
         this->key = key;
         this->prox = prox;
     };
+    SymbEntry(string key, SymbEntry *prox)
+    {
+        this->key = key;
+        this->prox = prox;
+    };
     ~SymbEntry(){};
     string getKey() { return key; };
     int getToken() { return token; };
@@ -36,31 +41,42 @@ class LinkedList
 public:
     LinkedList();
     ~LinkedList();
-    int get(int k);           /// retorna o valor do k-�simo elemento
-    void insereFinal(SymbEntry *p);  /// insere um SymbEntryvo SymbEntry contendo val SymbEntry final da lista
-    void removeInicio();      /// remove o first SymbEntry da lista
-    void removeFinal();       /// remove o �ltimo SymbEntry da lista
+    int get(int k);                 /// retorna o valor do k-�simo elemento
+    void insereFinal(SymbEntry *p); /// insere um SymbEntryvo SymbEntry contendo val SymbEntry final da lista
+    void removeInicio();            /// remove o first SymbEntry da lista
+    void removeFinal();             /// remove o �ltimo SymbEntry da lista
     void print();
 
 private:
     SymbEntry *first; /// ponteiro para o first SymbEntry da lista
-    SymbEntry *last;   /// ponteiro para o last SymbEntry da lista
-    int n;        /// numero de SymbEntrys na lista
+    SymbEntry *last;  /// ponteiro para o last SymbEntry da lista
+    int n;            /// numero de SymbEntrys na lista
 };
 
 class HashTable
 {
 public:
-    HashTable(int tam);
-    SymbEntry* insert(char* key, int token);
-    void insert(char* key, SymbEntry* info);
-    void insert(string key); // jeito que ele reclamou
+    HashTable();
+    virtual void insert(string key) = 0;
     void print();
 
-private:
-    int tam;
+protected:
     int hashFunction(string);
     LinkedList **table;
+};
+
+class ReservedWord : public HashTable
+{
+public:
+    // The implementation for insert is specific to reserved word.
+    void insert(string key);
+};
+
+class IdentifierOrLiteral : public HashTable
+{
+public:
+    // The implementation for insert is specific to identifier or literal.
+    void insert(string key);
 };
 
 #endif // HASH_H_INCLUDED

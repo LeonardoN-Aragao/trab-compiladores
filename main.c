@@ -3,6 +3,8 @@
 #include <string.h>
 #include "lexic.h"
 
+char *reservedWordsOflanguage[] = {"if", "else", "try", NULL};
+
 int main()
 {
    // char *text = "a+b= 2if(x == 2E-a)";
@@ -24,7 +26,7 @@ int main()
 
    while (fread(&initialBuffer, sizeof *initialBuffer, bufferSize, pf) > 1)
    {
-      lexical *x = lexical_construct();
+      lexical *x = lexical_construct(reservedWordsOflanguage);
       char *token;
       int tam = 0;
 

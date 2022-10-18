@@ -1,8 +1,9 @@
-#include "lexic.h"
-// #include "errorManager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lexic.h"
+#include "SymbolTable.h"
+// #include "errorManager.h"
 
 #define RED "\e[0;31m"
 #define NC "\e[0m"
@@ -10,17 +11,36 @@
 struct lexical
 {                // actual definition of the struct, local to lexical.c
    char *lexeme; // private variable
+   ReservedWord reservedWords;
+   IdentifierOrLiteral identifiers;
+   IdentifierOrLiteral literals;
 };
 
-lexical *lexical_construct()
+lexical *lexical_construct(char *reservedWordsOflanguage[])
 {
    lexical *obj;
    obj = (lexical *)malloc(sizeof(lexical));
+   ReservedWord reserved;
+   IdentifierOrLiteral id;
+   IdentifierOrLiteral lit;
+
    if (obj == NULL)
    {
       printf("Error creating lexical analyzer");
    }
    obj->lexeme = (char *)malloc(512 * sizeof(char));
+   obj->reservedWords = reserved;
+   obj->identifiers = id;
+   obj->literals = lit;
+
+   int i = 0;
+   while (reservedWordsOflanguage[i])
+   {
+      printf("%s\n", reservedWordsOflanguage[i]);
+      obj->reservedWords.insert(reservedWordsOflanguage[i]);
+      i++;
+   };
+
    return obj;
 }
 
