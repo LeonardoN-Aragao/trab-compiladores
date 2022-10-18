@@ -8,7 +8,7 @@
 #include <math.h>
 #include <cstdlib>
 using namespace std;
-#define SIZE    39
+#define SIZE 39
 
 LinkedList::LinkedList()
 {
@@ -56,7 +56,6 @@ int LinkedList::get(int k)
         return p->getToken();
 }
 
-
 void LinkedList::insereFinal(SymbEntry *p)
 {
     if (last != NULL)
@@ -67,6 +66,15 @@ void LinkedList::insereFinal(SymbEntry *p)
     n++;
     if (n == 1)
         first = p;
+}
+
+char * LinkedList::search(char * val)
+{
+    SymbEntry *p;
+    for (p = first; p != NULL; p = p->getProx())
+        if (p->getKey() == val)
+            return p->getKey();
+    return "";
 }
 
 void LinkedList::removeInicio()
@@ -120,18 +128,19 @@ HashTable::HashTable()
     }
 }
 
-
-int convertStringToInteger(string id)
+int convertStringToInteger(char *key)
 {
-    int soma = 0;
-    for (int i = 0; i < id.length(); i++)
+    int sum = 0;
+    int index = 0;
+    while (key[index] != '\0')
     {
-        soma += id[i];
+        sum += key[index];
+        index++;
     }
-    return soma;
+    return sum;
 }
 
-int HashTable::hashFunction(string key)
+int HashTable::hashFunction(char * key)
 {
     double C = 0.6180339887;
     int intKey = convertStringToInteger(key);
@@ -139,22 +148,24 @@ int HashTable::hashFunction(string key)
     return i;
 }
 
-void ReservedWord::insert(string key)
+char * ReservedWord::insert(char * key)
 {
     int index = hashFunction(key);
     cout << "indice: " << index << endl;
     SymbEntry *p = new SymbEntry(index, key, NULL);
     table[index]->insereFinal(p);
     cout << "inseriu" << endl;
+    return p->getKey();
 }
 
-void IdentifierOrLiteral::insert(string key)
+char * IdentifierOrLiteral::insert(char * key)
 {
     int index = hashFunction(key);
     cout << "indice: " << index << endl;
     SymbEntry *p = new SymbEntry(key, NULL);
     table[index]->insereFinal(p);
     cout << "inseriu" << endl;
+    return p->getKey();
 }
 
 void HashTable::print()
@@ -165,4 +176,10 @@ void HashTable::print()
         table[i]->print();
         cout << endl;
     }
+}
+
+char * HashTable::search(char * key)
+{
+    int index = hashFunction(key);
+    return table[index]->search(key);
 }

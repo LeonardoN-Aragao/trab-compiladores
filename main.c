@@ -7,8 +7,6 @@ char *reservedWordsOflanguage[] = {"if", "else", "try", NULL};
 
 int main()
 {
-   // char *text = "a+b= 2if(x == 2E-a)";
-
    // // Declaramos um ponteiro(link para o endereço da memória) para o arquivo de nome: 'pf'
    FILE *pf;
    int bufferSize = 512;
@@ -26,15 +24,15 @@ int main()
 
    while (fread(&initialBuffer, sizeof *initialBuffer, bufferSize, pf) > 1)
    {
-      lexical *x = lexical_construct(reservedWordsOflanguage);
+      lexical *lex = lexical_construct(reservedWordsOflanguage);
       char *token;
       int tam = 0;
 
       while (initialBuffer[tam] != '\0')
       {
          printf("char %c \n", initialBuffer[tam]);
-         char teste = initialBuffer[tam];
-         token = nextToken(x, teste);
+         char *entry = &initialBuffer[tam];
+         token = nextToken(lex, entry);
          tam++;
 
          if (token)

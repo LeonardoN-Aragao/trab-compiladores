@@ -5,33 +5,32 @@
 #include <fstream>
 #include <cstdlib>
 
-typedef std::string string;
 using namespace std;
 
 class SymbEntry
 {
 private:
     int token; /// valor armazenado SymbEntry SymbEntry
-    string key;
+    char * key;
     SymbEntry *prox; /// ponteiro para o proximo SymbEntry
 
 public:
-    SymbEntry(int token, string key, SymbEntry *prox)
+    SymbEntry(int token, char * key, SymbEntry *prox)
     {
         this->token = token;
         this->key = key;
         this->prox = prox;
     };
-    SymbEntry(string key, SymbEntry *prox)
+    SymbEntry(char * key, SymbEntry *prox)
     {
         this->key = key;
         this->prox = prox;
     };
     ~SymbEntry(){};
-    string getKey() { return key; };
+    char * getKey() { return key; };
     int getToken() { return token; };
     SymbEntry *getProx() { return prox; };
-    void setKey(string val) { key = val; };
+    void setKey(char * val) { key = val; };
     void setToken(int val) { token = val; };
     void setProx(SymbEntry *p) { prox = p; };
 };
@@ -41,7 +40,8 @@ class LinkedList
 public:
     LinkedList();
     ~LinkedList();
-    int get(int k);                 /// retorna o valor do k-�simo elemento
+    int get(int k);
+    char * search(char * val);                  /// retorna o valor do k-�simo elemento
     void insereFinal(SymbEntry *p); /// insere um SymbEntryvo SymbEntry contendo val SymbEntry final da lista
     void removeInicio();            /// remove o first SymbEntry da lista
     void removeFinal();             /// remove o �ltimo SymbEntry da lista
@@ -57,11 +57,12 @@ class HashTable
 {
 public:
     HashTable();
-    virtual void insert(string key) = 0;
+    virtual char * insert(char * key) = 0;
     void print();
+    char * search(char * key);
 
 protected:
-    int hashFunction(string);
+    int hashFunction(char *);
     LinkedList **table;
 };
 
@@ -69,14 +70,14 @@ class ReservedWord : public HashTable
 {
 public:
     // The implementation for insert is specific to reserved word.
-    void insert(string key);
+    char * insert(char * key);
 };
 
 class IdentifierOrLiteral : public HashTable
 {
 public:
     // The implementation for insert is specific to identifier or literal.
-    void insert(string key);
+    char * insert(char * key);
 };
 
 #endif // HASH_H_INCLUDED
