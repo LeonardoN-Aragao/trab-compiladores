@@ -22,7 +22,7 @@
 #define lessOrEqual 19
 #define semicolon 20
 #define exclamation 21
-#define assing 22
+#define assignment 22
 #define ampersand 23
 #define great 24
 #define minusSign 25
@@ -36,17 +36,43 @@
 #define numInt 33
 #define numFloat 34
 
+
+#define int_ 35
+#define float_ 36
+#define bool_ 37
+#define char_ 38
+#define double_ 39
+#define long_ 40
+#define if_ 41
+#define else_ 42
+#define while_ 43
+#define switch_ 44
+#define case_ 45
+#define break_ 46
+#define print_ 47
+#define readln_ 48
+#define return_ 49
+#define throw_ 50
+#define try_ 51
+#define catch_ 52
+#define true_ 53
+#define false_ 54
+#define typedef_ 55
+#define struct_ 56
+
 typedef struct lexical lexical; // forward declaration of incomplete type
 extern int position;
 
 lexical *lexical_construct(
     char *reservedWordsOflanguage[]);
 lexical *lexical_destruct(lexical *obj);
+
 int nextToken(lexical *obj, char text, char *buffer);
+char nextChar(lexical *lex, char *buffer);
+
 char *getLexeme(lexical *obj);
 void buildLexeme(lexical *obj, char *str2);
-char nextChar(lexical *lex, char *buffer);
-char *searchAndGetString(lexical *lex, int token, char *lexeme);
 
+char *searchAndGetString(lexical *lex, int token, char *lexeme);
 
 #endif /* LEXIC_H */

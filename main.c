@@ -3,7 +3,10 @@
 #include <string.h>
 #include "lexic.h"
 
-char *reservedWordsOflanguage[] = {"if", "else", "try", NULL};
+char *reservedWordsOflanguage[] = {"int", "float", "bool", "char", "double",
+                                   "long", "if", "else", "while", "switch", "case", "break", "print",
+                                   "readln", "return", "throw", "try", "catch", "true",
+                                   "false", "typedef", "struct"};
 
 const char *getTokenName(int value)
 {
@@ -33,7 +36,7 @@ const char *getTokenName(int value)
       NAME(lessOrEqual)
       NAME(semicolon)
       NAME(exclamation)
-      NAME(assing)
+      NAME(assignment)
       NAME(ampersand)
       NAME(great)
       NAME(minusSign)
@@ -47,6 +50,28 @@ const char *getTokenName(int value)
       NAME(literal)
       NAME(numInt)
       NAME(numFloat)
+      NAME(int_)
+      NAME(float_)
+      NAME(bool_)
+      NAME(char_)
+      NAME(double_)
+      NAME(long_)
+      NAME(if_)
+      NAME(else_)
+      NAME(while_)
+      NAME(switch_)
+      NAME(case_)
+      NAME(break_)
+      NAME(print_)
+      NAME(readln_)
+      NAME(return_)
+      NAME(throw_)
+      NAME(try_)
+      NAME(catch_)
+      NAME(true_)
+      NAME(false_)
+      NAME(typedef_)
+      NAME(struct_)
    }
    return "unknown";
 #undef NAME
@@ -61,7 +86,7 @@ int main()
 
    lexical *lex = lexical_construct(reservedWordsOflanguage);
 
-   pf = fopen("test.txt", "r");
+   pf = fopen("test1.txt", "r");
    if (NULL == pf)
    {
       printf("file can't be opened \n");
@@ -76,9 +101,8 @@ int main()
 
       teste = &initialBuffer[0];
 
-
       while (token != EOF)
-      {  
+      {
          t = nextChar(lex, teste);
          // printf("next char main %c \n", t);
          token = nextToken(lex, t, teste);
@@ -86,11 +110,12 @@ int main()
          if (token != NULL)
          {
             const char *tName = getTokenName(token);
-            if (token == 30 || token == 31 || token == 32 || token == 33 || token == 34)
+            if (token == 31 || token == 32 || token == 33 || token == 34)
             {
                char *s = searchAndGetString(lex, token, getLexeme(lex));
                printf("%s.%s \n", tName, s);
             }
+
             else
             {
                printf("%s \n", tName);

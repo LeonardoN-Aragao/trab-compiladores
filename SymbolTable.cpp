@@ -88,7 +88,6 @@ char *LinkedList::search(char *val)
     for (p = first; p != NULL; p = p->getProx())
     {
 
-
         if (is_equal(p->getKey(), val))
         {
             return p->getKey();
@@ -96,6 +95,21 @@ char *LinkedList::search(char *val)
     }
 
     return NULL;
+}
+
+int LinkedList::searchAndReturnToken(char *val)
+{
+    SymbEntry *p;
+    for (p = first; p != NULL; p = p->getProx())
+    {
+
+        if (is_equal(p->getKey(), val))
+        {
+            return p->getToken();
+        }
+    }
+
+    return -100;
 }
 
 void LinkedList::removeInicio()
@@ -169,20 +183,20 @@ int HashTable::hashFunction(char *key)
     return i;
 }
 
-char *ReservedWord::insert(char *key)
+int ReservedWord::insert(char *key, int token)
 {
     int index = hashFunction(key);
-    SymbEntry *p = new SymbEntry(index, key, NULL);
+    SymbEntry *p = new SymbEntry(token, key, NULL);
     table[index]->insereFinal(p);
-    return p->getKey();
+    return p->getToken();
 }
 
-char *IdentifierOrLiteral::insert(char *key)
+int IdentifierOrLiteral::insert(char *key)
 {
     int index = hashFunction(key);
     SymbEntry *p = new SymbEntry(key, NULL);
     table[index]->insereFinal(p);
-    return p->getKey();
+    return index;
 }
 
 void HashTable::print()
@@ -195,11 +209,9 @@ void HashTable::print()
     }
 }
 
-char *HashTable::search(char *key)
+char *IdentifierOrLiteral::search(char *key)
 {
-
     int index = hashFunction(key);
-
     char *ret;
     ret = table[index]->search(key);
     if (ret == "")
@@ -207,4 +219,16 @@ char *HashTable::search(char *key)
         return NULL;
     }
     return table[index]->search(key);
+}
+
+int ReservedWord::search(char *key)
+{
+    int index = hashFunction(key);
+    char *ret;
+    ret = table[index]->search(key);
+    if (ret == "")
+    {
+        return NULL;
+    }
+    return table[index]->searchAndReturnToken(key);
 }

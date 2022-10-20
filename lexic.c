@@ -41,11 +41,13 @@ lexical *lexical_construct(char *reservedWordsOflanguage[])
    obj->floatNumbers = floatNumbers;
 
    int i = 0;
+   int j = 35;
    while (reservedWordsOflanguage[i])
    {
       // printf("%s\n", reservedWordsOflanguage[i]);
-      obj->reservedWords.insert(reservedWordsOflanguage[i]);
+      obj->reservedWords.insert(reservedWordsOflanguage[i], j);
       i++;
+      j++;
    };
 
    return obj;
@@ -92,6 +94,7 @@ int nextToken(lexical *obj, char text, char *buffer)
    char c;
    int token;
    int state = 0;
+   int result;
    obj->lexeme = "";
    int done = 0;
    // errorManager error;
@@ -102,11 +105,13 @@ int nextToken(lexical *obj, char text, char *buffer)
       token = EOF;
       return token;
    }
-   int result;
+
    result = isspace(c);
 
    if (result != 0)
+   {
       return NULL;
+   }
 
    do
    {
@@ -420,7 +425,7 @@ int nextToken(lexical *obj, char text, char *buffer)
          break;
       case 23:
 
-         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
          {
             buildLexeme(obj, c);
             c = nextChar(obj, buffer);
@@ -478,7 +483,7 @@ int nextToken(lexical *obj, char text, char *buffer)
          return token;
          break;
       case 33:
-         token = assing;
+         token = assignment;
          done = 1;
          return token;
          break;
@@ -508,12 +513,12 @@ int nextToken(lexical *obj, char text, char *buffer)
          return token;
          break;
       case 39:
-         char *isReservedWord;
-         isReservedWord = obj->reservedWords.search(obj->lexeme);
+         int tokenId;
+         tokenId = obj->reservedWords.search(obj->lexeme);
 
-         if (isReservedWord != NULL)
+         if (tokenId != -100)
          {
-            token = ReservedWordOfLanguage;
+            token = tokenId;
          }
          else
          {
@@ -529,6 +534,11 @@ int nextToken(lexical *obj, char text, char *buffer)
                token = identifier;
             }
          }
+         result = isspace(c);
+         if (result == 0)
+         {
+            position--;
+         }
 
          done = 1;
          return token;
@@ -537,6 +547,7 @@ int nextToken(lexical *obj, char text, char *buffer)
          if (c >= '0' && c <= '9')
          {
             buildLexeme(obj, c);
+            c = nextChar(obj, buffer);
             state = 40;
          }
          else if (c == 'e' || c == 'E')
@@ -551,7 +562,6 @@ int nextToken(lexical *obj, char text, char *buffer)
          }
          else
          {
-
             state = 41;
          }
          break;
@@ -567,6 +577,12 @@ int nextToken(lexical *obj, char text, char *buffer)
          {
             obj->intNumbers.insert(obj->lexeme);
             token = numInt;
+         }
+
+         result = isspace(c);
+         if (result == 0)
+         {
+            position--;
          }
          done = 1;
          return token;
@@ -697,6 +713,12 @@ int nextToken(lexical *obj, char text, char *buffer)
             obj->floatNumbers.insert(obj->lexeme);
             token = numFloat;
          }
+         result = isspace(c);
+         if (result == 0)
+         {
+            position--;
+         }
+
          done = 1;
          return token;
          break;
@@ -823,10 +845,6 @@ char *searchAndGetString(lexical *lex, int token, char *lexeme)
    char *b;
    switch (token)
    {
-   case 30:
-      b = lex->reservedWords.search(lexeme);
-      return b;
-      break;
    case 31:
       b = lex->identifiers.search(lexeme);
       return b;
@@ -848,4 +866,5 @@ char *searchAndGetString(lexical *lex, int token, char *lexeme)
    default:
       break;
    }
-}
+};
+
