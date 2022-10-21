@@ -30,7 +30,7 @@
 #define lessSign 27
 #define slash 28
 #define dot 29
-#define ReservedWordOfLanguage 30
+
 #define identifier 31
 #define literal 32
 #define numInt 33
@@ -62,13 +62,15 @@
 
 typedef struct lexical lexical; // forward declaration of incomplete type
 extern int position;
+extern int qntReallocations;
+extern int wantShow;
 
 lexical *lexical_construct(
     char *reservedWordsOflanguage[]);
 lexical *lexical_destruct(lexical *obj);
 
-int nextToken(lexical *obj, char text, char *buffer);
-char nextChar(lexical *lex, char *buffer);
+int nextToken(lexical *obj);
+char nextChar(lexical *lex);
 
 char *getLexeme(lexical *obj);
 void buildLexeme(lexical *obj, char *str2);

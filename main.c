@@ -45,7 +45,6 @@ const char *getTokenName(int value)
       NAME(slash)
       NAME(dot)
       NAME(EOF)
-      NAME(ReservedWordOfLanguage)
       NAME(identifier)
       NAME(literal)
       NAME(numInt)
@@ -80,51 +79,33 @@ const char *getTokenName(int value)
 int main()
 {
    // // Declaramos um ponteiro(link para o endereço da memória) para o arquivo de nome: 'pf'
-   FILE *pf;
-   int bufferSize = 512;
-   char initialBuffer[bufferSize];
 
    lexical *lex = lexical_construct(reservedWordsOflanguage);
 
-   pf = fopen("test1.txt", "r");
-   if (NULL == pf)
+   int token = 0;
+   while (token != EOF)
    {
-      printf("file can't be opened \n");
-   }
 
-   while (fread(&initialBuffer, sizeof *initialBuffer, bufferSize, pf) > 1)
-   {
-      // char *token = "";
-      int token = 0;
-      char t;
-      char *teste;
-
-      teste = &initialBuffer[0];
-
-      while (token != EOF)
+      // printf("next char main \n");
+      token = nextToken(lex);
+      // printf("next token %d \n", token);
+      if (token != NULL)
       {
-         t = nextChar(lex, teste);
-         // printf("next char main %c \n", t);
-         token = nextToken(lex, t, teste);
-         // printf("next token %d \n", token);
-         if (token != NULL)
+         const char *tName = getTokenName(token);
+         if (token == 31 || token == 32 || token == 33 || token == 34)
          {
-            const char *tName = getTokenName(token);
-            if (token == 31 || token == 32 || token == 33 || token == 34)
-            {
-               char *s = searchAndGetString(lex, token, getLexeme(lex));
-               printf("%s.%s \n", tName, s);
-            }
+            char *s = searchAndGetString(lex, token, getLexeme(lex));
+            printf("%s.%s \n", tName, s);
+         }
 
-            else
-            {
-               printf("%s \n", tName);
-            }
+         else
+         {
+            printf("%s \n", tName);
          }
       }
    }
 
-   fclose(pf);
+   // fclose(pf);
 
    return 0;
 }
