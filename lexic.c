@@ -170,7 +170,7 @@ int setDone(char c)
    return 1;
 }
 
-char *appended(char const *src, char const ch)
+char *makeCopy(char const *src, char const ch)
 {
    size_t const size = strlen(src);
    char *copy = (char *)malloc(size + 2);
@@ -692,9 +692,7 @@ int nextToken(lexical *obj)
             isIdentifier = obj->identifiers.search(obj->lexeme);
             if (isIdentifier == NULL)
             {
-
-               char *str = appended(obj->lexeme, '\0');
-
+               char *str = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
                obj->identifiers.insert(str);
 
                printf("INSERIU NA TAB DE IDS %s \n", obj->lexeme);
@@ -747,7 +745,8 @@ int nextToken(lexical *obj)
          }
          else
          {
-            // obj->intNumbers.insert(obj->lexeme);
+            char *intN = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+            obj->intNumbers.insert(intN);
             token = numInt;
          }
 
@@ -835,7 +834,9 @@ int nextToken(lexical *obj)
          }
          else
          {
-            // obj->literals.insert(obj->lexeme);
+
+            char *l = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+            obj->literals.insert(l);
             token = literal;
          }
          done = setDone(c);
@@ -894,7 +895,8 @@ int nextToken(lexical *obj)
          }
          else
          {
-            // obj->floatNumbers.insert(obj->lexeme);
+            char *f = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+            obj->floatNumbers.insert(f);
             token = numFloat;
          }
 
