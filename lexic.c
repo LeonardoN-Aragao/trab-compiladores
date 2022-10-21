@@ -170,6 +170,21 @@ int setDone(char c)
    return 1;
 }
 
+char *appended(char const *src, char const ch)
+{
+   size_t const size = strlen(src);
+   char *copy = (char *)malloc(size + 2);
+   if (!copy)
+   {
+      return 0;
+   }
+
+   memcpy(copy, src, size);
+   copy[size] = ch;
+   copy[size + 1] = 0;
+   return copy;
+}
+
 int nextToken(lexical *obj)
 {
    char c;
@@ -677,8 +692,12 @@ int nextToken(lexical *obj)
             isIdentifier = obj->identifiers.search(obj->lexeme);
             if (isIdentifier == NULL)
             {
-               obj->identifiers.insert(obj->lexeme);
-               printf("INSERINDO NA TAB DE IDS %s \n", obj->lexeme );
+
+               char *str = appended(obj->lexeme, '\0');
+
+               obj->identifiers.insert(str);
+
+               printf("INSERIU NA TAB DE IDS %s \n", obj->lexeme);
                obj->identifiers.print();
                token = identifier;
             }
@@ -728,7 +747,7 @@ int nextToken(lexical *obj)
          }
          else
          {
-            obj->intNumbers.insert(obj->lexeme);
+            // obj->intNumbers.insert(obj->lexeme);
             token = numInt;
          }
 
@@ -816,7 +835,7 @@ int nextToken(lexical *obj)
          }
          else
          {
-            obj->literals.insert(obj->lexeme);
+            // obj->literals.insert(obj->lexeme);
             token = literal;
          }
          done = setDone(c);
@@ -875,7 +894,7 @@ int nextToken(lexical *obj)
          }
          else
          {
-            obj->floatNumbers.insert(obj->lexeme);
+            // obj->floatNumbers.insert(obj->lexeme);
             token = numFloat;
          }
 
@@ -976,7 +995,7 @@ int nextToken(lexical *obj)
                obj->lexeme[t] = '\0';
                t++;
             }
-            
+
             c = nextChar(obj);
             state = 0;
             printf("opa %c \n", c);
