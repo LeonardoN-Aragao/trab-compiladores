@@ -13,54 +13,59 @@ using namespace std;
 
 LinkedList::LinkedList()
 {
-    // cout << "Criando objeto LinkedList" << endl;
     first = NULL;
     last = NULL;
     n = 0;
 }
 
-LinkedList::~LinkedList()
+void LinkedList::destructLinkedList()
 {
-    cout << "Destruindo objeto LinkedList" << endl;
     SymbEntry *p = first;
     while (p != NULL)
     {
-        SymbEntry *t = p->getProx();
+        SymbEntry *t = p->getNext();
         delete p;
         p = t;
     }
 }
 
-void LinkedList::print()
-{
-    SymbEntry *p;
-    for (p = first; p != NULL; p = p->getProx())
-        cout << "-> "
-             << "(" << (p->getToken()) << ", " << p->getKey() << ")";
-}
-
-int LinkedList::get(int k)
+void LinkedList::printWithToken(int i)
 {
     SymbEntry *p = first;
-    int i = 0;
-    while (i < k && p != NULL)
+    if (p != NULL)
     {
-        i++;
-        p = p->getProx();
+        cout << i << " ";
     }
-    if (p == NULL)
+    for (; p != NULL; p = p->getNext())
+        cout << " -> "
+             << "(" << (p->getToken()) << ", " << p->getKey() << ")";
+    p = first;
+    if (p != NULL)
     {
-        cout << "ERRO: Indice invalido!" << endl;
-        exit(1);
+        cout << endl;
     }
-    else
-        return p->getToken();
 }
 
-void LinkedList::insereFinal(SymbEntry *p)
+void LinkedList::print(int i)
+{
+    SymbEntry *p = first;
+    if (p != NULL)
+    {
+        cout << i << " ";
+    }
+    for (; p != NULL; p = p->getNext())
+        cout << " -> " << p->getKey();
+    p = first;
+    if (p != NULL)
+    {
+        cout << endl;
+    }
+}
+
+void LinkedList::insertEnd(SymbEntry *p)
 {
     if (last != NULL)
-        last->setProx(p);
+        last->setNext(p);
 
     last = p;
 
@@ -85,7 +90,7 @@ bool is_equal(const char *str1, const char *str2)
 char *LinkedList::search(char *val)
 {
     SymbEntry *p;
-    for (p = first; p != NULL; p = p->getProx())
+    for (p = first; p != NULL; p = p->getNext())
     {
 
         if (is_equal(p->getKey(), val))
@@ -100,7 +105,7 @@ char *LinkedList::search(char *val)
 int LinkedList::searchAndReturnToken(char *val)
 {
     SymbEntry *p;
-    for (p = first; p != NULL; p = p->getProx())
+    for (p = first; p != NULL; p = p->getNext())
     {
 
         if (is_equal(p->getKey(), val))
@@ -112,47 +117,23 @@ int LinkedList::searchAndReturnToken(char *val)
     return -100;
 }
 
-void LinkedList::removeInicio()
+int LinkedList::searchIsPresent(char *val)
 {
     SymbEntry *p;
-    if (first != NULL)
+    for (p = first; p != NULL; p = p->getNext())
     {
-        p = first;
-        first = p->getProx();
-        delete p;
 
-        n--;
-        if (n == 0)
-            last = NULL;
+        if (is_equal(p->getKey(), val))
+        {
+            return 1;
+        }
     }
-    else
-        cout << "ERRO: lista vazia!" << endl;
+
+    return -100;
 }
 
-void LinkedList::removeFinal()
-{
-    SymbEntry *p;
-    if (last != NULL)
-    {
-        if (first == last)
-        {
-            first = NULL;
-            p = NULL;
-        }
-        else
-        {
-            p = first;
-            while (p->getProx() != last)
-                p = p->getProx();
-            p->setProx(NULL);
-        }
-        delete last;
-        last = p;
-        n--;
-    }
-    else
-        cout << "ERRO: lista vazia!" << endl;
-}
+
+
 
 HashTable::HashTable()
 {
@@ -161,6 +142,16 @@ HashTable::HashTable()
     {
         table[i] = new LinkedList();
     }
+}
+
+void HashTable::destructHashTable()
+{
+    for (int i = 0; i < SIZE; i++)
+    {
+        table[i]->destructLinkedList();
+    }
+    table = NULL;
+    free(table);
 }
 
 int convertStringToInteger(char *key)
@@ -187,7 +178,7 @@ int ReservedWord::insert(char *key, int token)
 {
     int index = hashFunction(key);
     SymbEntry *p = new SymbEntry(token, key, NULL);
-    table[index]->insereFinal(p);
+    table[index]->insertEnd(p);
     return p->getToken();
 }
 
@@ -195,7 +186,7 @@ int IdentifierOrLiteral::insert(char *key)
 {
     int index = hashFunction(key);
     SymbEntry *p = new SymbEntry(key, NULL);
-    table[index]->insereFinal(p);
+    table[index]->insertEnd(p);
     return index;
 }
 
@@ -203,9 +194,7 @@ void HashTable::print()
 {
     for (int i = 0; i < SIZE; i++)
     {
-        cout << i << " ";
-        table[i]->print();
-        cout << endl;
+        table[i]->printWithToken(i);
     }
 }
 
@@ -221,6 +210,18 @@ char *IdentifierOrLiteral::search(char *key)
     return table[index]->search(key);
 }
 
+int IdentifierOrLiteral::isPresent(char *key)
+{
+    int index = hashFunction(key);
+    char *ret;
+    ret = table[index]->search(key);
+    if (ret == "")
+    {
+        return NULL;
+    }
+    return table[index]->searchIsPresent(key);
+}
+
 int ReservedWord::search(char *key)
 {
     int index = hashFunction(key);
@@ -231,4 +232,19 @@ int ReservedWord::search(char *key)
         return NULL;
     }
     return table[index]->searchAndReturnToken(key);
+}
+void IdentifierOrLiteral::print()
+{
+    for (int i = 0; i < SIZE; i++)
+    {
+        table[i]->print(i);
+    }
+}
+
+void ReservedWord::print()
+{
+    for (int i = 0; i < SIZE; i++)
+    {
+        table[i]->printWithToken(i);
+    }
 }

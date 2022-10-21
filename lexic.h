@@ -60,13 +60,15 @@
 #define typedef_ 55
 #define struct_ 56
 
+#define BUFFERSIZE 512
+
 typedef struct lexical lexical; // forward declaration of incomplete type
 extern int position;
 extern int qntReallocations;
 extern int wantShow;
 
 lexical *lexical_construct(
-    char *reservedWordsOflanguage[]);
+    char *reservedWordsOflanguage[], char* file, int readFromFile);
 lexical *lexical_destruct(lexical *obj);
 
 int nextToken(lexical *obj);
@@ -76,5 +78,6 @@ char *getLexeme(lexical *obj);
 void buildLexeme(lexical *obj, char *str2);
 
 char *searchAndGetString(lexical *lex, int token, char *lexeme);
+void printAllTables(lexical *lex);
 
 #endif /* LEXIC_H */

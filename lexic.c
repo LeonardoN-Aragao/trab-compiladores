@@ -7,7 +7,6 @@
 
 #define RED "\e[0;31m"
 #define NC "\e[0m"
-#define BUFFERSIZE 512
 
 int position = 0;
 int qntReallocations = 1;
@@ -22,10 +21,12 @@ struct lexical
    IdentifierOrLiteral intNumbers;
    IdentifierOrLiteral floatNumbers;
    char initialBuffer[BUFFERSIZE];
+   char *inputBuffer;
+   int readFromFile;
    FILE *pf;
 };
 
-lexical *lexical_construct(char *reservedWordsOflanguage[])
+lexical *lexical_construct(char *reservedWordsOflanguage[], char *file, int readFromFile)
 {
    lexical *obj;
    obj = (lexical *)malloc(sizeof(lexical));
@@ -45,6 +46,7 @@ lexical *lexical_construct(char *reservedWordsOflanguage[])
    obj->literals = lit;
    obj->intNumbers = intNumbers;
    obj->floatNumbers = floatNumbers;
+   obj->readFromFile = readFromFile;
 
    // printf("INICIAL ALOCACAO %p \n", obj->lexeme);
 
@@ -56,11 +58,17 @@ lexical *lexical_construct(char *reservedWordsOflanguage[])
       i++;
       j++;
    };
-
-   obj->pf = fopen("test1.txt", "r");
-   if (NULL == obj->pf)
+   if (readFromFile)
    {
-      printf("file can't be opened \n");
+      obj->pf = fopen(file, "r");
+      if (NULL == obj->pf)
+      {
+         printf("file can't be opened \n");
+      }
+   }
+   else
+   {
+      obj->inputBuffer = file;
    }
 
    return obj;
@@ -68,8 +76,19 @@ lexical *lexical_construct(char *reservedWordsOflanguage[])
 
 lexical *lexical_destruct(lexical *obj)
 {
-   free(obj);
    free(obj->lexeme);
+   if (obj->readFromFile)
+   {
+      fclose(obj->pf);
+   }
+   obj->reservedWords.destructHashTable();
+   obj->identifiers.destructHashTable();
+   obj->literals.destructHashTable();
+   obj->intNumbers.destructHashTable();
+   obj->floatNumbers.destructHashTable();
+
+   free(obj);
+
    return NULL;
 }
 
@@ -107,44 +126,38 @@ void buildLexeme(lexical *obj, char str2)
 
 char nextChar(lexical *lex)
 {
-   int len = strlen(lex->initialBuffer);
-   // printf("\n VEIO PARA RETORNAR NEXT CHAR position %d len %d \n", position, len);
-   if (len == 0 || position == BUFFERSIZE || position == len - 1)
+   char c;
+   if (lex->readFromFile)
    {
-      // printf("veio aq %d \n", position == BUFFERSIZE);
-      // printf("antes de ler %s \n", lex->initialBuffer);
-      // int q = 0;
-      // while (lex->initialBuffer[q] != '\0')
-      // {
-      //    lex->initialBuffer[q] = '\0';
-      //    q++;
-      // }
-      char testando[BUFFERSIZE];
-      int qnt = fread(&lex->initialBuffer, sizeof(char), BUFFERSIZE, lex->pf);
-      int bb = fread(&testando, sizeof(char), BUFFERSIZE, lex->pf);
-      // printf("\n INITIAL BUFFER %s \n", lex->initialBuffer);
-      // printf("\n TESTE BUFFER %s \n", testando);
-      // printf("depois de ler %s \n", lex->initialBuffer);
-
-      if (qnt == 0)
+      int len = strlen(lex->initialBuffer);
+      if (len == 0 || position == BUFFERSIZE || position == len - 1)
       {
-         // printf("retornou EOF \n");
-         // printf("lexema %s \n", lex->initialBuffer);
+         int qnt = fread(&lex->initialBuffer, sizeof(char), BUFFERSIZE, lex->pf);
+         // char testando[BUFFERSIZE];
+         // int bb = fread(&testando, sizeof(char), BUFFERSIZE, lex->pf);
+         if (qnt == 0)
+         {
+            return EOF;
+         }
+         else
+         {
+            position = 0;
+         }
+      }
+      c = lex->initialBuffer[position];
+      position++;
+   }
+   else
+   {
+      int len = strlen(lex->inputBuffer);
+      if (position == len - 1)
+      {
          return EOF;
       }
-      else
-      {
-         position = 0;
-         // printf("voltou pra posicao 0 %d \n", qnt);
-      }
-      // printf("CONTINUOU E N RETORNOU EOF \n");
+      c = lex->inputBuffer[position];
+      position++;
    }
-   // printf("POSITION  %d  LEN %d \n ", position, len);
 
-   char c = lex->initialBuffer[position];
-
-   position++;
-   // printf("position final  %d e carac %c \n", position, c);
    return c;
 }
 
@@ -160,10 +173,9 @@ int setDone(char c)
 int nextToken(lexical *obj)
 {
    char c;
-   int token;
+   int token, t;
    int state = 0;
    int result;
-   obj->lexeme[0] = '\0';
    wantShow = 0;
    int done = 0;
    errorManager error;
@@ -176,7 +188,7 @@ int nextToken(lexical *obj)
       return token;
    }
 
-   int t = 1;
+   t = 0;
    while (obj->lexeme[t] != '\0')
    {
       obj->lexeme[t] = '\0';
@@ -200,10 +212,7 @@ int nextToken(lexical *obj)
       switch (state)
       {
       case 0:
-         if (c == EOF)
-         {
-            printf("eof no swithc \n");
-         }
+
          if (c == '-')
          {
             state = 1;
@@ -669,6 +678,8 @@ int nextToken(lexical *obj)
             if (isIdentifier == NULL)
             {
                obj->identifiers.insert(obj->lexeme);
+               printf("INSERINDO NA TAB DE IDS %s \n", obj->lexeme );
+               obj->identifiers.print();
                token = identifier;
             }
             else
@@ -952,10 +963,23 @@ int nextToken(lexical *obj)
             state = 61;
          }
          else
-         {
-            buildLexeme(obj, c);
+         { // it's a comment
+            char cBefore = c;
+            while (cBefore != '*' && c != '/')
+            {
+               cBefore = c;
+               c = nextChar(obj);
+            }
+            t = 0;
+            while (obj->lexeme[t] != '\0')
+            {
+               obj->lexeme[t] = '\0';
+               t++;
+            }
+            
             c = nextChar(obj);
-            state = 60;
+            state = 0;
+            printf("opa %c \n", c);
          }
          break;
       case 61:
@@ -1012,6 +1036,7 @@ char *searchAndGetString(lexical *lex, int token, char *lexeme)
    {
    case 31:
       b = lex->identifiers.search(lexeme);
+      // lex->identifiers.print();
       return b;
       break;
    case 32:
@@ -1031,3 +1056,27 @@ char *searchAndGetString(lexical *lex, int token, char *lexeme)
       break;
    }
 };
+
+void printAllTables(lexical *lex)
+{
+   printf("TABELA DE SÍMBOLOS: PALAVRAS RESERVADAS \n");
+   printf("IMPRIMINDO A TUPLA (TOKEN, LEXEMA) \n");
+   printf("================================== \n");
+   lex->reservedWords.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: IDENTIFICADORES \n");
+   printf("================================== \n");
+   lex->identifiers.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: LITERAIS \n");
+   printf("================================== \n");
+   lex->literals.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: NUMEROS INTEIROS \n");
+   printf("================================== \n");
+   lex->intNumbers.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: NUMEROS REAIS \n");
+   printf("================================== \n");
+   lex->floatNumbers.print();
+}
