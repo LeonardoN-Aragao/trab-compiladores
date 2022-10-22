@@ -46,7 +46,6 @@ public:
     void printWithToken(int i);
     int searchAndReturnToken(char *val);
 
-    int searchIsPresent(char *val);
 
 private:
     SymbEntry *first; /// ponteiro para o first SymbEntry da lista
@@ -82,7 +81,6 @@ public:
     int insert(char *key);
     char *search(char *key);
     void print();
-    int isPresent(char *key);
 };
 
 #endif // HASH_H_INCLUDED

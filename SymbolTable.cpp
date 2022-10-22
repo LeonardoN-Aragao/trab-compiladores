@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <string.h>
 using namespace std;
-#define SIZE 39
+#define SIZE 97
 
 LinkedList::LinkedList()
 {
@@ -117,20 +117,7 @@ int LinkedList::searchAndReturnToken(char *val)
     return -100;
 }
 
-int LinkedList::searchIsPresent(char *val)
-{
-    SymbEntry *p;
-    for (p = first; p != NULL; p = p->getNext())
-    {
 
-        if (is_equal(p->getKey(), val))
-        {
-            return 1;
-        }
-    }
-
-    return -100;
-}
 
 
 
@@ -210,17 +197,7 @@ char *IdentifierOrLiteral::search(char *key)
     return table[index]->search(key);
 }
 
-int IdentifierOrLiteral::isPresent(char *key)
-{
-    int index = hashFunction(key);
-    char *ret;
-    ret = table[index]->search(key);
-    if (ret == "")
-    {
-        return NULL;
-    }
-    return table[index]->searchIsPresent(key);
-}
+
 
 int ReservedWord::search(char *key)
 {
@@ -229,7 +206,7 @@ int ReservedWord::search(char *key)
     ret = table[index]->search(key);
     if (ret == "")
     {
-        return NULL;
+        return -100;
     }
     return table[index]->searchAndReturnToken(key);
 }

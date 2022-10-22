@@ -9,11 +9,11 @@
 #define NC "\e[0m"
 
 typedef struct errorManager {
-   char* message;
+   const char* message;
    int code;
 } errorManager;
 
-errorManager createError(int code, char* message) {
+errorManager createError(int code, const char* message) {
    errorManager error;
    error.code = code;
    error.message = message;
