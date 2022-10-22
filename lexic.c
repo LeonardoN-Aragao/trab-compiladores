@@ -48,7 +48,6 @@ lexical *lexical_construct(char *reservedWordsOflanguage[], char *file, int read
    obj->floatNumbers = floatNumbers;
    obj->readFromFile = readFromFile;
 
-   // printf("INICIAL ALOCACAO %p \n", obj->lexeme);
 
    int i = 0;
    int j = 35;
@@ -100,7 +99,6 @@ char *getLexeme(lexical *obj)
 void buildLexeme(lexical *obj, char str2)
 {
    size_t const size = strlen(obj->lexeme);
-   // printf("\nvoltou pra concatenar lexema: %d : %s\n", size,obj->lexeme );
 
    if (size == (qntReallocations * BUFFERSIZE) - 1)
    {
@@ -109,18 +107,7 @@ void buildLexeme(lexical *obj, char str2)
    }
 
    obj->lexeme[size] = str2;
-   // printf("size inserido %d %c \n", size, str2);
 
-   //    if (wantShow)
-   // {
-   //    printf("lexema %s \n", obj->lexeme);
-   //    wantShow = 0;
-   // }
-
-   // printf("lexema %s \n", obj->lexeme);
-
-   // char* teste = obj->lexeme[size];
-   // printf("retornou isso  %s \n", teste );
 }
 
 char nextChar(lexical *lex)
@@ -194,7 +181,6 @@ int nextToken(lexical *obj)
    int done = 0;
    errorManager error;
    c = nextChar(obj);
-   // printf("novo char %c ", c);
    if (c == EOF)
    {
       printf("CHEHHHHHHHHHHHHHHHHHHHHH \n");
@@ -213,9 +199,7 @@ int nextToken(lexical *obj)
    {
       return -100;
    }
-   // printf("novo next token %c \n", c);
-   // printf("lexema inicial %s \n", obj->lexeme);
-   // printf("=============");
+
    do
    {
 
@@ -375,7 +359,6 @@ int nextToken(lexical *obj)
             c = nextChar(obj);
 
             state = 23;
-            break;
          }
          else if (c == ';')
          {
@@ -490,7 +473,6 @@ int nextToken(lexical *obj)
          return token;
          break;
       case 9:
-         // printf("CASE 9 RECONHECENDO %c  ", c);
          token = lparent;
          done = setDone(c);
          return token;
@@ -553,6 +535,7 @@ int nextToken(lexical *obj)
          if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
             buildLexeme(obj, c);
+
             c = nextChar(obj);
             state = 50;
          }
@@ -560,6 +543,7 @@ int nextToken(lexical *obj)
          {
             state = 48;
          }
+         break;
       case 19:
          token = plusSign;
          done = setDone(c);
@@ -591,18 +575,14 @@ int nextToken(lexical *obj)
 
          if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
          {
-            // printf("veio no 23 %c \n", c);
             buildLexeme(obj, c);
-            // printf("contruindo lexema %s \n", obj->lexeme);
             c = nextChar(obj);
 
-            // printf("POSITIONS %d \n", position);
 
             state = 23;
          }
          else
          {
-            // printf("veio pra 39 \n");
 
             state = 39;
          }
@@ -683,7 +663,6 @@ int nextToken(lexical *obj)
          return token;
          break;
       case 39:
-         // printf("o que vou reconhecer %s \n", obj->lexeme);
          int tokenId;
          tokenId = obj->reservedWords.search(obj->lexeme);
 
@@ -700,8 +679,7 @@ int nextToken(lexical *obj)
                char *str = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
                obj->identifiers.insert(str);
 
-               // printf("INSERIU NA TAB DE IDS %s \n", obj->lexeme);
-               // obj->identifiers.print();
+            
                token = identifier;
             }
             else
@@ -712,7 +690,6 @@ int nextToken(lexical *obj)
          // position--;
 
          done = setDone(c);
-         // printf("setou na tab %d \n", position);
          return token;
          break;
       case 40:
@@ -798,7 +775,6 @@ int nextToken(lexical *obj)
          }
          else
          {
-            printf("case 45 %c \n", c);
             state = 54;
          }
          break;
@@ -854,7 +830,6 @@ int nextToken(lexical *obj)
          }
          else if (c == '\\')
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 18;
@@ -927,7 +902,7 @@ int nextToken(lexical *obj)
             c = nextChar(obj);
             state = 57;
          }
-         else 
+         else
          {
             buildLexeme(obj, c);
             c = nextChar(obj);
