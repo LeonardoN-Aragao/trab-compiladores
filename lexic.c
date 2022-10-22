@@ -178,7 +178,6 @@ int nextToken(lexical *obj)
    c = nextChar(obj);
    if (c == EOF)
    {
-      printf("CHEHHHHHHHHHHHHHHHHHHHHH \n");
       token = EOF;
       return token;
    }
@@ -845,7 +844,6 @@ int nextToken(lexical *obj)
          }
          else
          {
-            printf("build %c \n", c);
             concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 50;
@@ -878,7 +876,6 @@ int nextToken(lexical *obj)
          error = createError(4, "Invalid Number");
          printError(error);
          c = nextChar(obj);
-         printf("proximo %c \n", c);
          state = 0;
 
          break;
