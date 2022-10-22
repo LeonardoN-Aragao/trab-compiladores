@@ -120,8 +120,6 @@ int LinkedList::searchAndReturnToken(char *val)
 
 
 
-
-
 HashTable::HashTable()
 {
     table = (LinkedList **)malloc(sizeof(LinkedList *) * SIZE);
@@ -188,9 +186,9 @@ void HashTable::print()
 char *IdentifierOrLiteral::search(char *key)
 {
     int index = hashFunction(key);
-    char *ret;
-    ret = table[index]->search(key);
-    if (ret == "")
+    char *res;
+    res= table[index]->search(key);
+    if (res== "")
     {
         return NULL;
     }
@@ -202,9 +200,9 @@ char *IdentifierOrLiteral::search(char *key)
 int ReservedWord::search(char *key)
 {
     int index = hashFunction(key);
-    char *ret;
-    ret = table[index]->search(key);
-    if (ret == "")
+    char *res;
+    res= table[index]->search(key);
+    if (res== "")
     {
         return -100;
     }
