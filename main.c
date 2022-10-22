@@ -96,7 +96,6 @@ int main(int argc, char **argv)
          char *con = (char *)malloc(size + 4);
          strcpy(con, fileName);
          strcat(con, ".cmm");
-         printf("final  %s \n", con);
          fileName = con;
       }
       readFromFile = 1;
@@ -104,13 +103,13 @@ int main(int argc, char **argv)
    else
    {
       char *text = (char *)calloc(1, 1), buffer[BUFFERSIZE];
-      printf("Enter a message: \n");
-      while (*(fgets(buffer, BUFFERSIZE, stdin)) != '\n') /* break with ^D or ^Z */
+      printf("Enter with your text: \n");
+      while (*(fgets(buffer, BUFFERSIZE, stdin)) != '\n') /* break with ^\n */
       {
          text = (char *)realloc(text, strlen(text) + 1 + strlen(buffer));
          strcat(text, buffer); /* note a '\n' is appended here everytime */
       }
-      printf("\ntext:\n%s", text);
+      printf("\nyour input:\n%s", text);
       fileName = text;
       readFromFile = 0;
    }
@@ -119,9 +118,7 @@ int main(int argc, char **argv)
    int token = 0;
    while (token != EOF)
    {
-      // printf("next char main \n");
       token = nextToken(lex);
-      // printf("next token %d \n", token);
       if (token != -100)
       {
          const char *tName = getTokenName(token);
@@ -146,3 +143,5 @@ int main(int argc, char **argv)
 
    return 0;
 }
+
+

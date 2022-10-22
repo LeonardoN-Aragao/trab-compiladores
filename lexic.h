@@ -65,7 +65,6 @@
 typedef struct lexical lexical; // forward declaration of incomplete type
 extern int position;
 extern int qntReallocations;
-extern int wantShow;
 
 lexical *lexical_construct(
     char *reservedWordsOflanguage[], char* file, int readFromFile);

@@ -10,19 +10,18 @@
 
 int position = 0;
 int qntReallocations = 1;
-int wantShow = 0;
 
 struct lexical
 {                // actual definition of the struct, local to lexical.c
-   char *lexeme; // private variable
+   char *lexeme; // private variables
    ReservedWord reservedWords;
    IdentifierOrLiteral identifiers;
    IdentifierOrLiteral literals;
    IdentifierOrLiteral intNumbers;
    IdentifierOrLiteral floatNumbers;
-   char initialBuffer[BUFFERSIZE];
-   char *inputBuffer;
-   int readFromFile;
+   char fileBuffer[BUFFERSIZE]; // used if the input is a file
+   char *inputBuffer;           // used if the input is stdin
+   int readFromFile;            // binary variable to decide to use inputBuffer or fileBuffer
    FILE *pf;
 };
 
@@ -48,9 +47,8 @@ lexical *lexical_construct(char *reservedWordsOflanguage[], char *file, int read
    obj->floatNumbers = floatNumbers;
    obj->readFromFile = readFromFile;
 
-
    int i = 0;
-   int j = 35;
+   int j = 35; // reserved words token ranges from 35 to 56
    while (reservedWordsOflanguage[i])
    {
       obj->reservedWords.insert(reservedWordsOflanguage[i], j);
@@ -107,7 +105,6 @@ void buildLexeme(lexical *obj, char str2)
    }
 
    obj->lexeme[size] = str2;
-
 }
 
 char nextChar(lexical *lex)
@@ -115,12 +112,10 @@ char nextChar(lexical *lex)
    char c;
    if (lex->readFromFile)
    {
-      int len = strlen(lex->initialBuffer);
+      int len = strlen(lex->fileBuffer);
       if (len == 0 || position == BUFFERSIZE || position == len)
       {
-         int qnt = fread(&lex->initialBuffer, sizeof(char), BUFFERSIZE, lex->pf);
-         // char testando[BUFFERSIZE];
-         // int bb = fread(&testando, sizeof(char), BUFFERSIZE, lex->pf);
+         int qnt = fread(&lex->fileBuffer, sizeof(char), BUFFERSIZE, lex->pf);
          if (qnt == 0)
          {
             return EOF;
@@ -130,7 +125,7 @@ char nextChar(lexical *lex)
             position = 0;
          }
       }
-      c = lex->initialBuffer[position];
+      c = lex->fileBuffer[position];
       position++;
    }
    else
@@ -150,12 +145,13 @@ char nextChar(lexical *lex)
 int setDone(char c)
 {
    int result = isspace(c);
-
+   // if the next character isn't a white space and isn't EOF, go back one position in the buffer
    if (result == 0 && c != EOF)
       position--;
    return 1;
 }
 
+// just concatenate a char* with a single char and return a new string
 char *makeCopy(char const *src, char const ch)
 {
    size_t const size = strlen(src);
@@ -177,7 +173,6 @@ int nextToken(lexical *obj)
    int token, t;
    int state = 0;
    int result;
-   wantShow = 0;
    int done = 0;
    errorManager error;
    c = nextChar(obj);
@@ -202,7 +197,6 @@ int nextToken(lexical *obj)
 
    do
    {
-
       switch (state)
       {
       case 0:
@@ -312,21 +306,18 @@ int nextToken(lexical *obj)
          }
          else if (c == '{')
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 16;
          }
          else if (c == '.')
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 17;
          }
          else if (c == '+')
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 19;
@@ -340,7 +331,6 @@ int nextToken(lexical *obj)
          }
          else if (c == '\\')
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 21;
@@ -381,7 +371,7 @@ int nextToken(lexical *obj)
          }
          else if (c == '/')
          {
-
+            printf("vai pro 51");
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 51;
@@ -399,7 +389,6 @@ int nextToken(lexical *obj)
             {
                c = nextChar(obj);
             }
-            // position--;
          }
          break;
       case 1:
@@ -578,7 +567,6 @@ int nextToken(lexical *obj)
             buildLexeme(obj, c);
             c = nextChar(obj);
 
-
             state = 23;
          }
          else
@@ -666,7 +654,7 @@ int nextToken(lexical *obj)
          int tokenId;
          tokenId = obj->reservedWords.search(obj->lexeme);
 
-         if (tokenId != -100)
+         if (tokenId != -100) // was found in the table
          {
             token = tokenId;
          }
@@ -679,7 +667,6 @@ int nextToken(lexical *obj)
                char *str = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
                obj->identifiers.insert(str);
 
-            
                token = identifier;
             }
             else
@@ -687,7 +674,6 @@ int nextToken(lexical *obj)
                token = identifier;
             }
          }
-         // position--;
 
          done = setDone(c);
          return token;
@@ -813,7 +799,6 @@ int nextToken(lexical *obj)
          }
          else
          {
-
             char *l = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
             obj->literals.insert(l);
             token = literal;
@@ -892,6 +877,7 @@ int nextToken(lexical *obj)
          error = createError(4, "Invalid Number");
          printError(error);
          c = nextChar(obj);
+         printf("proximo %c \n", c);
          state = 0;
 
          break;
@@ -995,7 +981,6 @@ int nextToken(lexical *obj)
          c = nextChar(obj);
          break;
       case 62:
-         // token = "Comment";
          done = setDone(c);
          return token;
          break;
@@ -1035,33 +1020,30 @@ int nextToken(lexical *obj)
    return -100;
 };
 
+// if the token is an identifier, literal or a number, it's necessary to search in its respective symbol table
 char *searchAndGetString(lexical *lex, int token, char *lexeme)
 {
-
    char *b;
    switch (token)
    {
-   case 31:
+   case 31: // token number for identifier
       b = lex->identifiers.search(lexeme);
-      // lex->identifiers.print();
       return b;
-      break;
-   case 32:
+
+   case 32:  // token number for literal
       b = lex->literals.search(lexeme);
       return b;
-      break;
-   case 33:
+
+   case 33: // token number for integers
       b = lex->intNumbers.search(lexeme);
       return b;
-      break;
-   case 34:
+
+   case 34: // token number for real numbers
       b = lex->floatNumbers.search(lexeme);
       return b;
-      break;
 
    default:
       return NULL;
-      break;
    }
 };
 
