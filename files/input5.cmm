@@ -1,0 +1,19 @@
+int main(int argc, char **argv)
+{
+   double timespent = 0.0;
+   /* este comentario pode se 
+   estender 
+   por varias linhas */
+   if (argc > 1)
+   {
+      fileName = argv[1];
+      sizet const size = strlen(fileName);
+        /* novo comentario */
+      if (fileName[size - 1] != 'm' && fileName[size - 2] != 'm' && fileName[size - 3] != 'c')
+      {
+         char *con = (char *)malloc(size + 4);
+         strcpy(con, fileName);
+         strcat(con, ".cmm");
+         printf("final  %s \n", con);
+      }
+   }

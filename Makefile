@@ -1,6 +1,6 @@
 compile: 
 	g++ *.c* *.h -o program
 run:
-	./program
+	./program $(file)
 clear:
 	rm -f program

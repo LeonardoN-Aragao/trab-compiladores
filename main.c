@@ -86,7 +86,6 @@ int main(int argc, char **argv)
 
    char *fileName;
    int readFromFile;
-   // // Declaramos um ponteiro(link para o endereço da memória) para o arquivo de nome: 'pf'
    if (argc > 1)
    {
       fileName = argv[1];
@@ -103,6 +102,7 @@ int main(int argc, char **argv)
    else
    {
       char *text = (char *)calloc(1, 1), buffer[BUFFERSIZE];
+      printf("You need to press enter twice to exit \n");
       printf("Enter with your text: \n");
       while (*(fgets(buffer, BUFFERSIZE, stdin)) != '\n') /* break with ^\n */
       {
@@ -137,11 +137,9 @@ int main(int argc, char **argv)
    clock_t end = clock();
    time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 
-   // printAllTables(lex);
+   printAllTables(lex);
    lexical_destruct(lex);
    printf("The elapsed time is %f seconds \n", time_spent);
 
    return 0;
 }
-
-

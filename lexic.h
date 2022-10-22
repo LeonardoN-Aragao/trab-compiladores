@@ -74,7 +74,7 @@ int nextToken(lexical *obj);
 char nextChar(lexical *lex);
 
 char *getLexeme(lexical *obj);
-void buildLexeme(lexical *obj, char *str2);
+void concatenateLexeme(lexical *obj, char *str2);
 
 char *searchAndGetString(lexical *lex, int token, char *lexeme);
 void printAllTables(lexical *lex);

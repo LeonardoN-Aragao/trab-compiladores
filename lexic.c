@@ -94,7 +94,7 @@ char *getLexeme(lexical *obj)
    return obj->lexeme;
 }
 
-void buildLexeme(lexical *obj, char str2)
+void concatenateLexeme(lexical *obj, char str2)
 {
    size_t const size = strlen(obj->lexeme);
 
@@ -200,201 +200,201 @@ int nextToken(lexical *obj)
       switch (state)
       {
       case 0:
-
-         if (c == '-')
-         {
-            state = 1;
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-         }
-         else if (c == '=')
-         {
-            state = 2;
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-         }
-         else if (c == '|')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 3;
-         }
-         else if (c == '&')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 4;
-         }
-         else if (c == '>')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 5;
-         }
-         else if (c == '<')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 22;
-         }
-         else if (c == '[')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 6;
-         }
-         else if (c == '*')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 7;
-         }
-         else if (c == '(')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 9;
-         }
-         else if (c == ',')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 10;
-         }
-         else if (c == '!')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 11;
-         }
-         else if (c == ':')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 12;
-         }
-         else if (c == ')')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 13;
-         }
-         else if (c == '}')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 14;
-         }
-         else if (c == '%')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 15;
-         }
-         else if (c == '{')
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 16;
-         }
-         else if (c == '.')
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 17;
-         }
-         else if (c == '+')
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 19;
-         }
-         else if (c == ']')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 20;
-         }
-         else if (c == '\\')
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 21;
-         }
-         else if (c == '>')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 22;
-         }
-         else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-
-            state = 23;
-         }
-         else if (c == ';')
-         {
-
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 31;
-         }
-         else if (c >= '0' && c <= '9')
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 40;
-         }
-         else if (c == '\"')
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 50;
-         }
-         else if (c == '/')
-         {
-            printf("vai pro 51");
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 51;
-         }
-         else if (c == '\'') // escape the quote with a backslash
-         {
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            state = 55;
-         }
-
-         else if (isspace(c) != 0)
-         {
-            while (isspace(c) != 0)
+         if (c != EOF)
+            if (c == '-')
             {
+               state = 1;
+               concatenateLexeme(obj, c);
                c = nextChar(obj);
             }
-         }
+            else if (c == '=')
+            {
+               state = 2;
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+            }
+            else if (c == '|')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 3;
+            }
+            else if (c == '&')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 4;
+            }
+            else if (c == '>')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 5;
+            }
+            else if (c == '<')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 22;
+            }
+            else if (c == '[')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 6;
+            }
+            else if (c == '*')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 7;
+            }
+            else if (c == '(')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 9;
+            }
+            else if (c == ',')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 10;
+            }
+            else if (c == '!')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 11;
+            }
+            else if (c == ':')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 12;
+            }
+            else if (c == ')')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 13;
+            }
+            else if (c == '}')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 14;
+            }
+            else if (c == '%')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 15;
+            }
+            else if (c == '{')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 16;
+            }
+            else if (c == '.')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 17;
+            }
+            else if (c == '+')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 19;
+            }
+            else if (c == ']')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 20;
+            }
+            else if (c == '\\')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 21;
+            }
+            else if (c == '>')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 22;
+            }
+            else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+
+               state = 23;
+            }
+            else if (c == ';')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 31;
+            }
+            else if (c >= '0' && c <= '9')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 40;
+            }
+            else if (c == '\"')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 50;
+            }
+            else if (c == '/')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 51;
+            }
+            else if (c == '\'') // escape the quote with a backslash
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 55;
+            }
+
+            else if (isspace(c) != 0)
+            {
+               while (isspace(c) != 0)
+               {
+                  c = nextChar(obj);
+               }
+            }
          break;
       case 1:
          if (c == '>')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 24;
          }
@@ -406,7 +406,7 @@ int nextToken(lexical *obj)
       case 2:
          if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 25;
          }
@@ -418,7 +418,7 @@ int nextToken(lexical *obj)
       case 3:
          if (c == '|')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 26;
          }
@@ -430,7 +430,7 @@ int nextToken(lexical *obj)
       case 4:
          if (c == '&')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 27;
          }
@@ -442,7 +442,7 @@ int nextToken(lexical *obj)
       case 5:
          if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 28;
          }
@@ -474,7 +474,7 @@ int nextToken(lexical *obj)
       case 11:
          if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 29;
          }
@@ -511,7 +511,7 @@ int nextToken(lexical *obj)
       case 17:
          if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 43;
          }
@@ -523,7 +523,7 @@ int nextToken(lexical *obj)
       case 18:
          if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
 
             c = nextChar(obj);
             state = 50;
@@ -551,7 +551,7 @@ int nextToken(lexical *obj)
       case 22:
          if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 30;
          }
@@ -564,7 +564,7 @@ int nextToken(lexical *obj)
 
          if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
 
             state = 23;
@@ -591,7 +591,7 @@ int nextToken(lexical *obj)
          return token;
          break;
       case 27:
-         token = ampersand;
+         token = andSign;
          done = setDone(c);
          return token;
          break;
@@ -626,7 +626,7 @@ int nextToken(lexical *obj)
          return token;
          break;
       case 34:
-         token = andSign;
+         token = ampersand;
          done = setDone(c);
          return token;
          break;
@@ -681,19 +681,19 @@ int nextToken(lexical *obj)
       case 40:
          if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 40;
          }
          else if (c == 'e' || c == 'E')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 44;
          }
          else if (c == '.')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 43;
          }
@@ -723,13 +723,13 @@ int nextToken(lexical *obj)
       case 43:
          if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 43;
          }
          else if (c == 'e' || c == 'E')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 44;
          }
@@ -741,13 +741,13 @@ int nextToken(lexical *obj)
       case 44:
          if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 47;
          }
          else if (c == '+' || c == '-')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 45;
          }
@@ -755,7 +755,7 @@ int nextToken(lexical *obj)
       case 45:
          if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 47;
          }
@@ -773,7 +773,7 @@ int nextToken(lexical *obj)
       case 47:
          if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 47;
          }
@@ -809,13 +809,13 @@ int nextToken(lexical *obj)
       case 50:
          if (c == '\"')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 49;
          }
          else if (c == '\\')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 18;
          }
@@ -825,7 +825,7 @@ int nextToken(lexical *obj)
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 50;
          }
@@ -833,19 +833,20 @@ int nextToken(lexical *obj)
       case 51:
          if (c == '*')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 60;
          }
          else if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 63;
          }
          else
          {
-            buildLexeme(obj, c);
+            printf("build %c \n", c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 50;
          }
@@ -884,13 +885,13 @@ int nextToken(lexical *obj)
       case 55:
          if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 57;
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 56;
          }
@@ -898,13 +899,13 @@ int nextToken(lexical *obj)
       case 56:
          if (c == '\'')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 49;
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 59;
          }
@@ -912,7 +913,7 @@ int nextToken(lexical *obj)
       case 57:
          if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 49;
          }
@@ -927,7 +928,7 @@ int nextToken(lexical *obj)
       case 58:
          if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 49;
          }
@@ -946,7 +947,7 @@ int nextToken(lexical *obj)
       case 60:
          if (c == '*')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 58;
          }
@@ -959,7 +960,6 @@ int nextToken(lexical *obj)
             char cBefore = c;
             while (cBefore != '*' && c != '/')
             {
-
                cBefore = c;
                c = nextChar(obj);
             }
@@ -972,6 +972,12 @@ int nextToken(lexical *obj)
             }
 
             c = nextChar(obj);
+            if (c == EOF)
+            {
+               done = 1;
+               return EOF;
+            }
+
             state = 0;
          }
          break;
@@ -987,13 +993,13 @@ int nextToken(lexical *obj)
       case 63:
          if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 64;
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 63;
          }
@@ -1001,7 +1007,7 @@ int nextToken(lexical *obj)
       case 64:
          if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
             state = 62;
          }
@@ -1030,7 +1036,7 @@ char *searchAndGetString(lexical *lex, int token, char *lexeme)
       b = lex->identifiers.search(lexeme);
       return b;
 
-   case 32:  // token number for literal
+   case 32: // token number for literal
       b = lex->literals.search(lexeme);
       return b;
 
