@@ -108,8 +108,7 @@ void buildLexeme(lexical *obj, char str2)
       qntReallocations++;
    }
 
-   obj->lexeme[wantShow] = str2;
-   wantShow++;
+   obj->lexeme[size] = str2;
    // printf("size inserido %d %c \n", size, str2);
 
    //    if (wantShow)
@@ -203,11 +202,6 @@ int nextToken(lexical *obj)
       return token;
    }
 
-   if (c == '\n')
-   {
-      printf("MAIS UMA LINHA =================================\n");
-   }
-
    t = 0;
    while (obj->lexeme[t] != '\0')
    {
@@ -215,19 +209,15 @@ int nextToken(lexical *obj)
       t++;
    }
 
-   result = isspace(c);
-
-   if (result != 0)
+   if (isspace(c) != 0)
    {
-      return NULL;
+      return -100;
    }
    // printf("novo next token %c \n", c);
    // printf("lexema inicial %s \n", obj->lexeme);
    // printf("=============");
    do
    {
-
-      // printf("state %d \n ", state);
 
       switch (state)
       {
@@ -247,9 +237,10 @@ int nextToken(lexical *obj)
          }
          else if (c == '|')
          {
-            state = 3;
+
             buildLexeme(obj, c);
             c = nextChar(obj);
+            state = 3;
          }
          else if (c == '&')
          {
@@ -382,6 +373,7 @@ int nextToken(lexical *obj)
 
             buildLexeme(obj, c);
             c = nextChar(obj);
+
             state = 23;
             break;
          }
@@ -400,7 +392,6 @@ int nextToken(lexical *obj)
          }
          else if (c == '\"')
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 50;
@@ -412,12 +403,20 @@ int nextToken(lexical *obj)
             c = nextChar(obj);
             state = 51;
          }
-         else if (c == '\'')
+         else if (c == '\'') // escape the quote with a backslash
          {
-
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 55;
+         }
+
+         else if (isspace(c) != 0)
+         {
+            while (isspace(c) != 0)
+            {
+               c = nextChar(obj);
+            }
+            // position--;
          }
          break;
       case 1:
@@ -455,6 +454,7 @@ int nextToken(lexical *obj)
          {
             state = 37;
          }
+         break;
       case 4:
          if (c == '&')
          {
@@ -595,7 +595,7 @@ int nextToken(lexical *obj)
             buildLexeme(obj, c);
             // printf("contruindo lexema %s \n", obj->lexeme);
             c = nextChar(obj);
-            // printf("montando str %c \n", c);
+
             // printf("POSITIONS %d \n", position);
 
             state = 23;
@@ -726,7 +726,6 @@ int nextToken(lexical *obj)
          {
             buildLexeme(obj, c);
             c = nextChar(obj);
-            printf("go to state 44 %c \n", c);
             state = 44;
          }
          else if (c == '.')
@@ -779,7 +778,6 @@ int nextToken(lexical *obj)
       case 44:
          if (c >= '0' && c <= '9')
          {
-            printf("aaaaa vai pro 47 %c \n ", c);
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 47;
@@ -854,8 +852,9 @@ int nextToken(lexical *obj)
             c = nextChar(obj);
             state = 49;
          }
-         else if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
+         else if (c == '\\')
          {
+
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 18;
@@ -926,13 +925,13 @@ int nextToken(lexical *obj)
          {
             buildLexeme(obj, c);
             c = nextChar(obj);
-            state = 49;
+            state = 57;
          }
-         else
+         else 
          {
             buildLexeme(obj, c);
             c = nextChar(obj);
-            state = 59;
+            state = 56;
          }
          break;
       case 56:
@@ -941,6 +940,12 @@ int nextToken(lexical *obj)
             buildLexeme(obj, c);
             c = nextChar(obj);
             state = 49;
+         }
+         else
+         {
+            buildLexeme(obj, c);
+            c = nextChar(obj);
+            state = 59;
          }
          break;
       case 57:
@@ -993,9 +998,11 @@ int nextToken(lexical *obj)
             char cBefore = c;
             while (cBefore != '*' && c != '/')
             {
+
                cBefore = c;
                c = nextChar(obj);
             }
+
             t = 0;
             while (obj->lexeme[t] != '\0')
             {
@@ -1005,7 +1012,6 @@ int nextToken(lexical *obj)
 
             c = nextChar(obj);
             state = 0;
-            printf("opa %c \n", c);
          }
          break;
       case 61:
@@ -1051,7 +1057,7 @@ int nextToken(lexical *obj)
 
    } while (done != 1);
 
-   return NULL;
+   return -100;
 };
 
 char *searchAndGetString(lexical *lex, int token, char *lexeme)
@@ -1079,6 +1085,7 @@ char *searchAndGetString(lexical *lex, int token, char *lexeme)
       break;
 
    default:
+      return NULL;
       break;
    }
 };

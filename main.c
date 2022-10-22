@@ -80,9 +80,9 @@ const char *getTokenName(int value)
 int main(int argc, char **argv)
 {
 
-    double time_spent = 0.0;
- 
-    clock_t begin = clock();
+   double time_spent = 0.0;
+
+   clock_t begin = clock();
 
    char *fileName;
    int readFromFile;
@@ -138,10 +138,9 @@ int main(int argc, char **argv)
       }
    }
    clock_t end = clock();
-    time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
- 
-    
-   printAllTables(lex);
+   time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+
+   // printAllTables(lex);
    lexical_destruct(lex);
    printf("The elapsed time is %f seconds \n", time_spent);
 
