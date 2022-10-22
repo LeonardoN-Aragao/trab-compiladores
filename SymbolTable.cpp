@@ -34,7 +34,7 @@ void LinkedList::printWithToken(int i)
     SymbEntry *p = first;
     if (p != NULL)
     {
-        cout << i << " ";
+        cout << i << ") ";
     }
     for (; p != NULL; p = p->getNext())
         cout << " -> "
@@ -51,7 +51,7 @@ void LinkedList::print(int i)
     SymbEntry *p = first;
     if (p != NULL)
     {
-        cout << i << " ";
+        cout << i << ") ";
     }
     for (; p != NULL; p = p->getNext())
         cout << " -> " << p->getKey();

@@ -130,7 +130,7 @@ char nextChar(lexical *lex)
    if (lex->readFromFile)
    {
       int len = strlen(lex->initialBuffer);
-      if (len == 0 || position == BUFFERSIZE || position == len - 1)
+      if (len == 0 || position == BUFFERSIZE || position == len)
       {
          int qnt = fread(&lex->initialBuffer, sizeof(char), BUFFERSIZE, lex->pf);
          // char testando[BUFFERSIZE];
@@ -201,6 +201,11 @@ int nextToken(lexical *obj)
       printf("CHEHHHHHHHHHHHHHHHHHHHHH \n");
       token = EOF;
       return token;
+   }
+
+   if (c == '\n')
+   {
+      printf("MAIS UMA LINHA =================================\n");
    }
 
    t = 0;
@@ -695,8 +700,8 @@ int nextToken(lexical *obj)
                char *str = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
                obj->identifiers.insert(str);
 
-               printf("INSERIU NA TAB DE IDS %s \n", obj->lexeme);
-               obj->identifiers.print();
+               // printf("INSERIU NA TAB DE IDS %s \n", obj->lexeme);
+               // obj->identifiers.print();
                token = identifier;
             }
             else

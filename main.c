@@ -131,7 +131,7 @@ int main(int argc, char **argv)
          }
       }
    }
-   // printAllTables(lex);
+   printAllTables(lex);
    lexical_destruct(lex);
 
    return 0;
