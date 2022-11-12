@@ -3,54 +3,89 @@
 #include <string.h>
 #include "lexic.h"
 #include "SymbolTable.h"
-// #include "errorManager.h"
+#include "errorManager.h"
 
 #define RED "\e[0;31m"
 #define NC "\e[0m"
 
-int tam = 0;
-int bufferSize = 512;
+int position = 0;
+int qntReallocations = 1;
 
 struct lexical
 {                // actual definition of the struct, local to lexical.c
-   char *lexeme; // private variable
+   char *lexeme; // private variables
    ReservedWord reservedWords;
    IdentifierOrLiteral identifiers;
    IdentifierOrLiteral literals;
-   char initialBuffer[512];
+   IdentifierOrLiteral intNumbers;
+   IdentifierOrLiteral floatNumbers;
+   char fileBuffer[BUFFERSIZE]; // used if the input is a file
+   char *inputBuffer;           // used if the input is stdin
+   int readFromFile;            // binary variable to decide to use inputBuffer or fileBuffer
+   FILE *pf;
 };
 
-lexical *lexical_construct(char *reservedWordsOflanguage[])
+lexical *lexical_construct(char *reservedWordsOflanguage[], char *file, int readFromFile)
 {
    lexical *obj;
    obj = (lexical *)malloc(sizeof(lexical));
    ReservedWord reserved;
    IdentifierOrLiteral id;
    IdentifierOrLiteral lit;
+   IdentifierOrLiteral intNumbers;
+   IdentifierOrLiteral floatNumbers;
 
    if (obj == NULL)
    {
       printf("Error creating lexical analyzer");
    }
-   obj->lexeme = (char *)malloc(512 * sizeof(char));
+   obj->lexeme = (char *)malloc(BUFFERSIZE * sizeof(char));
    obj->reservedWords = reserved;
    obj->identifiers = id;
    obj->literals = lit;
+   obj->intNumbers = intNumbers;
+   obj->floatNumbers = floatNumbers;
+   obj->readFromFile = readFromFile;
 
    int i = 0;
+   int j = 35; // reserved words token ranges from 35 to 56
    while (reservedWordsOflanguage[i])
    {
-      printf("%s\n", reservedWordsOflanguage[i]);
-      obj->reservedWords.insert(reservedWordsOflanguage[i]);
+      obj->reservedWords.insert(reservedWordsOflanguage[i], j);
       i++;
+      j++;
    };
+   if (readFromFile)
+   {
+      obj->pf = fopen(file, "r");
+      if (NULL == obj->pf)
+      {
+         printf("file can't be opened \n");
+      }
+   }
+   else
+   {
+      obj->inputBuffer = file;
+   }
 
    return obj;
 }
 
 lexical *lexical_destruct(lexical *obj)
 {
+   free(obj->lexeme);
+   if (obj->readFromFile)
+   {
+      fclose(obj->pf);
+   }
+   obj->reservedWords.destructHashTable();
+   obj->identifiers.destructHashTable();
+   obj->literals.destructHashTable();
+   obj->intNumbers.destructHashTable();
+   obj->floatNumbers.destructHashTable();
+
    free(obj);
+
    return NULL;
 }
 
@@ -59,218 +94,307 @@ char *getLexeme(lexical *obj)
    return obj->lexeme;
 }
 
-void buildLexeme(lexical *obj, char *str2)
+void concatenateLexeme(lexical *obj, char str2)
 {
-   // printf("CONSTRUIBO LEXEMA \n");
-   // printf("como veio %s \n", obj->lexeme);
-   char *str3 = (char *)malloc(512 * sizeof(char));
-   strcpy(str3, obj->lexeme);
-   strcat(str3, str2);
-   obj->lexeme = str3;
-   // printf("str3 %s \n", str3);
-}
-char *nextChar(lexical *lex)
-{
-   char *a[4];
-   a[0] = "i";
-   a[1] = "f";
-   a[2] = ")";
-   a[3] = "(";
+   size_t const size = strlen(obj->lexeme);
 
-   // char *myfile[] = {"i", "f", ")", "("};
-   printf("tam %d \n", tam);
-   char *t = a[tam];
-   if (tam < 3)
+   if (size == (qntReallocations * BUFFERSIZE) - 1)
    {
-      tam++;
+      obj->lexeme = (char *)realloc(obj->lexeme, (qntReallocations * BUFFERSIZE) + 512);
+      qntReallocations++;
    }
 
-   return t;
-   // char* buf = (char *)malloc(512 * sizeof(char));
-   // buf = lex->initialBuffer;
-   // printf("BUF %s", &buf[0]);
-   // if (buf != '\0')
-   // {
-
-   // char t = lex->initialBuffer[tam];
-   // char *entry = &t;
-   // char *teste = &lex->initialBuffer[0];
-   // printf("retunnnnnnnnn %s \n", &teste[0]);
-   // return entry;
-   //   }
+   obj->lexeme[size] = str2;
 }
 
-void readFile(lexical *lex)
+char nextChar(lexical *lex)
 {
-   FILE *pf;
-   pf = fopen("test.txt", "r");
-   if (NULL == pf)
+   char c;
+   if (lex->readFromFile)
    {
-      printf("file can't be opened \n");
+      int len = strlen(lex->fileBuffer);
+      if (len == 0 || position == BUFFERSIZE || position == len)
+      {
+         int qnt = fread(&lex->fileBuffer, sizeof(char), BUFFERSIZE, lex->pf);
+         if (qnt == 0)
+         {
+            return EOF;
+         }
+         else
+         {
+            position = 0;
+         }
+      }
+      c = lex->fileBuffer[position];
+      position++;
    }
-   printf("antes while\n");
-   while (fread(&lex->initialBuffer, sizeof *lex->initialBuffer, bufferSize, pf) > 1)
+   else
    {
-      char *token;
-      char *c, *t;
-      t = nextChar(lex);
-      printf("QUEM E VC %s \n", t);
-      token = nextToken(lex, t);
-      printf("IMPRIMINDO TOKEN ENCONTRADO %s \n", token);
+      int len = strlen(lex->inputBuffer);
+      if (position == len - 1)
+      {
+         return EOF;
+      }
+      c = lex->inputBuffer[position];
+      position++;
    }
-   fclose(pf);
+
+   return c;
 }
 
-char *nextToken(lexical *obj, char *text)
+int setDone(char c)
 {
-   char *c;
-   char *token;
+   int result = isspace(c);
+   // if the next character isn't a white space and isn't EOF, go back one position in the buffer
+   if (result == 0 && c != EOF)
+      position--;
+   return 1;
+}
+
+// just concatenate a char* with a single char and return a new string
+char *makeCopy(char const *src, char const ch)
+{
+   size_t const size = strlen(src);
+   char *copy = (char *)malloc(size + 2);
+   if (!copy)
+   {
+      return 0;
+   }
+
+   memcpy(copy, src, size);
+   copy[size] = ch;
+   copy[size + 1] = 0;
+   return copy;
+}
+
+int nextToken(lexical *obj)
+{
+   char c;
+   int token, t;
    int state = 0;
+   int result;
    int done = 0;
-   // errorManager error;
-   c = text;
+   errorManager error;
+   c = nextChar(obj);
+   if (c == EOF)
+   {
+      token = EOF;
+      return token;
+   }
+
+   t = 0;
+   while (obj->lexeme[t] != '\0')
+   {
+      obj->lexeme[t] = '\0';
+      t++;
+   }
+
+   if (isspace(c) != 0)
+   {
+      return -100;
+   }
+
    do
    {
       switch (state)
       {
       case 0:
-         if (*c == '-')
-         {
-            state = 1;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '=')
-         {
-            state = 2;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '|')
-         {
-            state = 3;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '&')
-         {
-            state = 4;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '>')
-         {
-            state = 5;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '[')
-         {
-            state = 6;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '*')
-         {
-            state = 7;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '(')
-         {
-            state = 9;
-            buildLexeme(obj, c);
-         }
-         else if (*c == ',')
-         {
-            state = 10;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '!')
-         {
-            state = 11;
-            buildLexeme(obj, c);
-         }
-         else if (*c == ':')
-         {
-            state = 12;
-            buildLexeme(obj, c);
-         }
-         else if (*c == ')')
-         {
-            state = 13;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '}')
-         {
-            state = 14;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '%')
-         {
-            state = 15;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '{')
-         {
-            state = 16;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '.')
-         {
-            state = 17;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '+')
-         {
-            state = 19;
-            buildLexeme(obj, c);
-         }
-         else if (*c == ']')
-         {
-            state = 20;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '\\')
-         {
-            state = 21;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '>')
-         {
-            state = 22;
-            buildLexeme(obj, c);
-         }
-         else if ((*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z'))
-         {
-            state = 23;
-            buildLexeme(obj, c);
-            c = nextChar(obj);
-            break;
-         }
-         else if (*c == ';')
-         {
-            state = 31;
-            buildLexeme(obj, c);
-         }
-         else if (*c >= '0' && *c <= '9')
-         {
-            state = 40;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '\"')
-         {
-            state = 50;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '/')
-         {
-            state = 51;
-            buildLexeme(obj, c);
-         }
-         else if (*c == '\'')
-         {
-            state = 55;
-            buildLexeme(obj, c);
-         }
+         if (c != EOF)
+            if (c == '-')
+            {
+               state = 1;
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+            }
+            else if (c == '=')
+            {
+               state = 2;
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+            }
+            else if (c == '|')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 3;
+            }
+            else if (c == '&')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 4;
+            }
+            else if (c == '>')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 5;
+            }
+            else if (c == '<')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 22;
+            }
+            else if (c == '[')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 6;
+            }
+            else if (c == '*')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 7;
+            }
+            else if (c == '(')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 9;
+            }
+            else if (c == ',')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 10;
+            }
+            else if (c == '!')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 11;
+            }
+            else if (c == ':')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 12;
+            }
+            else if (c == ')')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 13;
+            }
+            else if (c == '}')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 14;
+            }
+            else if (c == '%')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 15;
+            }
+            else if (c == '{')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 16;
+            }
+            else if (c == '.')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 17;
+            }
+            else if (c == '+')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 19;
+            }
+            else if (c == ']')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 20;
+            }
+            else if (c == '\\')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 21;
+            }
+            else if (c == '>')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 22;
+            }
+            else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+
+               state = 23;
+            }
+            else if (c == ';')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 31;
+            }
+            else if (c >= '0' && c <= '9')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 40;
+            }
+            else if (c == '\"')
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 50;
+            }
+            else if (c == '/')
+            {
+
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 51;
+            }
+            else if (c == '\'') // escape the quote with a backslash
+            {
+               concatenateLexeme(obj, c);
+               c = nextChar(obj);
+               state = 55;
+            }
+
+            else if (isspace(c) != 0)
+            {
+               while (isspace(c) != 0)
+               {
+                  c = nextChar(obj);
+               }
+            }
          break;
       case 1:
-         if (*c == '>')
+         if (c == '>')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 24;
          }
          else
@@ -279,9 +403,10 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 2:
-         if (*c == '=')
+         if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 25;
          }
          else
@@ -290,19 +415,22 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 3:
-         if (*c == '|')
+         if (c == '|')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 26;
          }
          else
          {
             state = 37;
          }
+         break;
       case 4:
-         if (*c == '&')
+         if (c == '&')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 27;
          }
          else
@@ -311,9 +439,10 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 5:
-         if (*c == '=')
+         if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 28;
          }
          else
@@ -322,29 +451,30 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 6:
-         token = "lbrackets";
-         done = 1;
+         token = lbrackets;
+         done = setDone(c);
          return token;
          break;
       case 7:
-         token = "asterisk";
-         done = 1;
+         token = asterisk;
+         done = setDone(c);
          return token;
          break;
       case 9:
-         token = "lparent";
-         done = 1;
+         token = lparent;
+         done = setDone(c);
          return token;
          break;
       case 10:
-         token = "comma";
-         done = 1;
+         token = comma;
+         done = setDone(c);
          return token;
          break;
       case 11:
-         if (*c == '=')
+         if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 29;
          }
          else
@@ -353,34 +483,35 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 12:
-         token = "colon";
-         done = 1;
+         token = colon;
+         done = setDone(c);
          return token;
          break;
       case 13:
-         token = "rparent";
-         done = 1;
+         token = rparent;
+         done = setDone(c);
          return token;
          break;
       case 14:
-         token = "rbraces";
-         done = 1;
+         token = rbraces;
+         done = setDone(c);
          return token;
          break;
       case 15:
-         token = "percent";
-         done = 1;
+         token = percent;
+         done = setDone(c);
          return token;
          break;
       case 16:
-         token = "lbraces";
-         done = 1;
+         token = lbraces;
+         done = setDone(c);
          return token;
          break;
       case 17:
-         if (*c >= '0' && *c <= '9')
+         if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 43;
          }
          else
@@ -389,34 +520,38 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 18:
-         if (*c == 'a' || *c == 'b' || *c == 'f' || *c == 'n' || *c == 'v' || *c == 't' || *c == '\\' || *c == '\'' || *c == '\"' || *c == '\0' || *c == '\?')
+         if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+
+            c = nextChar(obj);
             state = 50;
          }
          else
          {
             state = 48;
          }
+         break;
       case 19:
-         token = "plus";
-         done = 1;
+         token = plusSign;
+         done = setDone(c);
          return token;
          break;
       case 20:
-         token = "rbrackets";
-         done = 1;
+         token = rbrackets;
+         done = setDone(c);
          return token;
          break;
       case 21:
-         token = "backslash";
-         done = 1;
+         token = backslash;
+         done = setDone(c);
          return token;
          break;
       case 22:
-         if (*c == '=')
+         if (c == '=')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 30;
          }
          else
@@ -425,137 +560,140 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 23:
-         printf("=============== \n");
-         printf("CASE 23 %s \n", c);
 
-         if ((*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z'))
+         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
          {
-            printf("QUAL ERA O CARACTER? %s \n", c);
-            buildLexeme(obj, c);
-            printf("CONTRUI O lexeme %s \n", obj->lexeme);
-            // c = "(";
+            concatenateLexeme(obj, c);
             c = nextChar(obj);
-            printf("qual o next: %s \n", c);
+
             state = 23;
-            break;
          }
          else
          {
-            printf("prox estado \n");
+
             state = 39;
          }
          break;
       case 24:
-         token = "arrow";
-         done = 1;
+         token = arrow;
+         done = setDone(c);
          return token;
          break;
       case 25:
-         token = "equal";
-         done = 1;
+         token = equality;
+         done = setDone(c);
          return token;
          break;
       case 26:
-         token = "or";
-         done = 1;
+         token = orSign;
+         done = setDone(c);
          return token;
          break;
       case 27:
-         token = "and";
-         done = 1;
+         token = andSign;
+         done = setDone(c);
          return token;
          break;
       case 28:
-         token = "greaterOrEqual";
-         done = 1;
+         token = greaterOrEqual;
+         done = setDone(c);
          return token;
          break;
       case 29:
-         token = "notEqual";
-         done = 1;
+         token = notEqual;
+         done = setDone(c);
          return token;
          break;
       case 30:
-         token = "lessOrEqual";
-         done = 1;
+         token = lessOrEqual;
+         done = setDone(c);
          return token;
          break;
       case 31:
-         token = "semicolon";
-         done = 1;
+         token = semicolon;
+         done = setDone(c);
          return token;
          break;
       case 32:
-         token = "exclamation";
-         done = 1;
+         token = exclamation;
+         done = setDone(c);
          return token;
          break;
       case 33:
-         token = "assing";
-         done = 1;
+         token = assignment;
+         done = setDone(c);
          return token;
          break;
       case 34:
-         token = "ampersand";
-         done = 1;
+         token = ampersand;
+         done = setDone(c);
          return token;
          break;
       case 35:
-         token = "great";
-         done = 1;
+         token = great;
+         done = setDone(c);
          return token;
          break;
       case 36:
-         token = "minus";
-         done = 1;
+         token = minusSign;
+         done = setDone(c);
          return token;
          break;
       case 37:
-         token = "verticalPipe";
-         done = 1;
+         token = verticalPipe;
+         done = setDone(c);
          return token;
          break;
       case 38:
-         token = "less";
-         done = 1;
+         token = lessSign;
+         done = setDone(c);
          return token;
          break;
       case 39:
-         if (obj->reservedWords.search(obj->lexeme) != "")
+         int tokenId;
+         tokenId = obj->reservedWords.search(obj->lexeme);
+
+         if (tokenId != -100) // was found in the table
          {
-            token = obj->reservedWords.search(obj->lexeme);
-            printf("achou nas reservadas %s \n", token);
-            free(obj->lexeme);
+            token = tokenId;
          }
          else
          {
-            if (obj->identifiers.search(obj->lexeme) != "")
+            char *isIdentifier;
+            isIdentifier = obj->identifiers.search(obj->lexeme);
+            if (isIdentifier == NULL)
             {
-               token = obj->identifiers.insert(obj->lexeme);
-               printf("inseriu na de IDS \n");
+               char *str = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+               obj->identifiers.insert(str);
+
+               token = identifier;
             }
             else
             {
-               token = obj->identifiers.search(obj->lexeme);
+               token = identifier;
             }
          }
-         done = 1;
+
+         done = setDone(c);
          return token;
          break;
       case 40:
-         if (*c >= '0' && *c <= '9')
+         if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 40;
          }
-         else if (*c == 'e' || *c == 'E')
+         else if (c == 'e' || c == 'E')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 44;
          }
-         else if (*c == '.')
+         else if (c == '.')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 43;
          }
          else
@@ -564,19 +702,34 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 41:
-         token = "numInt";
-         done = 1;
+
+         char *isAlreadyIntTable;
+         isAlreadyIntTable = obj->intNumbers.search(obj->lexeme);
+         if (isAlreadyIntTable != NULL)
+         {
+            token = numInt;
+         }
+         else
+         {
+            char *intN = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+            obj->intNumbers.insert(intN);
+            token = numInt;
+         }
+
+         done = setDone(c);
          return token;
          break;
       case 43:
-         if (*c >= '0' && *c <= '9')
+         if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 43;
          }
-         else if (*c == 'e' || *c == 'E')
+         else if (c == 'e' || c == 'E')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 44;
          }
          else
@@ -585,20 +738,24 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 44:
-         if (*c >= '0' && *c <= '9')
+         if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 47;
          }
-         else if (*c == '+' || *c == '-')
+         else if (c == '+' || c == '-')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 45;
          }
+         break;
       case 45:
-         if (*c >= '0' && *c <= '9')
+         if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 47;
          }
          else
@@ -607,188 +764,312 @@ char *nextToken(lexical *obj, char *text)
          }
          break;
       case 46:
-         // error = createError(1, "Unexpected end of file");
-         printf("error 46");
-         // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-         // return c;
+         error = createError(1, "Unexpected end of file");
+         printError(error);
+         state = 0;
+         c = nextChar(obj);
          break;
       case 47:
-         if (*c >= '0' && *c <= '9')
+         if (c >= '0' && c <= '9')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 47;
          }
          else
          {
             state = 52;
          }
+         break;
       case 48:
-         // error = createError(2, "Invalid escape character");
-         printf("error 48");
-         // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-         // return val;
+         error = createError(2, "Invalid escape character");
+         printError(error);
+         c = nextChar(obj);
+         state = 0;
+
          break;
       case 49:
-         token = "LITERAL";
-         done = 1;
+         char *isAlreadyInLiteralsTable;
+         isAlreadyInLiteralsTable = obj->literals.search(obj->lexeme);
+
+         if (isAlreadyInLiteralsTable != NULL)
+         {
+            token = literal;
+         }
+         else
+         {
+            char *l = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+            obj->literals.insert(l);
+            token = literal;
+         }
+         done = setDone(c);
          return token;
          break;
       case 50:
-         if (*c == '\"')
+         if (c == '\"')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 49;
          }
-         else if (*c == 'a' || *c == 'b' || *c == 'f' || *c == 'n' || *c == 'v' || *c == 't' || *c == '\\' || *c == '\'' || *c == '\"' || *c == '\0' || *c == '\?')
+         else if (c == '\\')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 18;
          }
-         else if (*c == EOF)
+         else if (c == EOF)
          {
             state = 58;
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 50;
          }
          break;
       case 51:
-         if (*c == '*')
+         if (c == '*')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 60;
          }
-         else if (*c == '/')
+         else if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 63;
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 50;
          }
          break;
       case 52:
-         token = "numFloat";
-         done = 1;
+         char *isAlreadyInFloatTable;
+         isAlreadyInFloatTable = obj->floatNumbers.search(obj->lexeme);
+         if (isAlreadyInFloatTable != NULL)
+         {
+            token = numFloat;
+         }
+         else
+         {
+            char *f = makeCopy(obj->lexeme, '\0'); // this was necessary because a lexeme change was affecting all table entries
+            obj->floatNumbers.insert(f);
+            token = numFloat;
+         }
+
+         done = setDone(c);
          return token;
          break;
       case 53:
-         // error = createError(3, "Invalid Number");
-         printf("error 53");
-         // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-         // return val;
+         token = dot;
+         done = setDone(c);
+         return token;
+
          break;
       case 54:
-         // error = createError(4, "Invalid Number");
-         printf("error 54");
-         // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-         // return val;
+         error = createError(4, "Invalid Number");
+         printError(error);
+         c = nextChar(obj);
+         state = 0;
+
          break;
       case 55:
-         if (*c == '/')
+         if (c == '/')
          {
-            buildLexeme(obj, c);
-            state = 49;
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
+            state = 57;
          }
          else
          {
-            buildLexeme(obj, c);
-            state = 59;
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
+            state = 56;
          }
          break;
       case 56:
-         if (*c == '\'')
+         if (c == '\'')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 49;
+         }
+         else
+         {
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
+            state = 59;
          }
          break;
       case 57:
-         if (*c == 'a' || *c == 'b' || *c == 'f' || *c == 'n' || *c == 'v' || *c == 't' || *c == '\\' || *c == '\'' || *c == '\"' || *c == '\0' || *c == '\?')
+         if (c == 'a' || c == 'b' || c == 'f' || c == 'n' || c == 'v' || c == 't' || c == '\\' || c == '\'' || c == '\"' || c == '\0' || c == '\?')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 49;
          }
          else
          {
-            // error = createError(5, "Invalid escape character");
-            printf("error 57");
-            // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-            // return val;
+            error = createError(5, "Invalid escape character");
+            printError(error);
+            c = nextChar(obj);
+            state = 0;
          }
+         break;
       case 58:
-         if (*c == '/')
+         if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 49;
          }
-         else if (*c == EOF)
+         else if (c == EOF)
          {
             state = 61;
          }
+         break;
       case 59:
-         // error = createError(6, "Invalid escape character");
-         printf("error 59");
-         // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-         // return val;
-         // continue;
+         error = createError(6, "Invalid escape character");
+         printError(error);
+         c = nextChar(obj);
+         state = 0;
+
          break;
       case 60:
-         if (*c == '*')
+         if (c == '*')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 58;
          }
-         else if (*c == EOF)
+         else if (c == EOF)
          {
             state = 61;
          }
          else
-         {
-            buildLexeme(obj, c);
-            state = 60;
+         { // it's a comment
+            char cBefore = c;
+            while (cBefore != '*' && c != '/')
+            {
+               cBefore = c;
+               c = nextChar(obj);
+            }
+
+            t = 0;
+            while (obj->lexeme[t] != '\0')
+            {
+               obj->lexeme[t] = '\0';
+               t++;
+            }
+
+            c = nextChar(obj);
+            if (c == EOF)
+            {
+               done = 1;
+               return EOF;
+            }
+
+            state = 0;
          }
+         break;
       case 61:
-         // error = createError(7, "Unexpected end of file in comment statement");
-         printf("error 61");
-         // insertLexicDataWithErro(token, lexeme, &val, i, 1);
-         // return val;
+         error = createError(7, "Unexpected end of file in comment statement");
+         printError(error);
+         c = nextChar(obj);
          break;
       case 62:
-         token = "Comment";
-         done = 1;
+         done = setDone(c);
          return token;
          break;
       case 63:
-         if (*c == '/')
+         if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 64;
          }
          else
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 63;
          }
+         break;
       case 64:
-         if (*c == '/')
+         if (c == '/')
          {
-            buildLexeme(obj, c);
+            concatenateLexeme(obj, c);
+            c = nextChar(obj);
             state = 62;
          }
+         break;
       case 65:
-         token = "slash";
-         done = 1;
-         done = 1;
+         token = slash;
+         done = setDone(c);
          return token;
          break;
       default:
          break;
       }
+
    } while (done != 1);
-   return NULL;
+
+   return -100;
+};
+
+// if the token is an identifier, literal or a number, it's necessary to search in its respective symbol table
+char *searchAndGetString(lexical *lex, int token, char *lexeme)
+{
+   char *b;
+   switch (token)
+   {
+   case 31: // token number for identifier
+      b = lex->identifiers.search(lexeme);
+      return b;
+
+   case 32: // token number for literal
+      b = lex->literals.search(lexeme);
+      return b;
+
+   case 33: // token number for integers
+      b = lex->intNumbers.search(lexeme);
+      return b;
+
+   case 34: // token number for real numbers
+      b = lex->floatNumbers.search(lexeme);
+      return b;
+
+   default:
+      return NULL;
+   }
+};
+
+void printAllTables(lexical *lex)
+{
+   printf("TABELA DE SÍMBOLOS: PALAVRAS RESERVADAS \n");
+   printf("IMPRIMINDO A TUPLA (TOKEN, LEXEMA) \n");
+   printf("================================== \n");
+   lex->reservedWords.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: IDENTIFICADORES \n");
+   printf("================================== \n");
+   lex->identifiers.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: LITERAIS \n");
+   printf("================================== \n");
+   lex->literals.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: NUMEROS INTEIROS \n");
+   printf("================================== \n");
+   lex->intNumbers.print();
+
+   printf("\n\nTABELA DE SÍMBOLOS: NUMEROS REAIS \n");
+   printf("================================== \n");
+   lex->floatNumbers.print();
 }

@@ -2,58 +2,144 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lexic.h"
+#include <time.h>
 
-char *reservedWordsOflanguage[] = {"if", "else", "try", NULL};
+char *reservedWordsOflanguage[] = {"int", "float", "bool", "char", "double",
+                                   "long", "if", "else", "while", "switch", "case", "break", "print",
+                                   "readln", "return", "throw", "try", "catch", "true",
+                                   "false", "typedef", "struct"};
 
-int main()
+const char *getTokenName(int value)
 {
-   // // Declaramos um ponteiro(link para o endereço da memória) para o arquivo de nome: 'pf'
-   // FILE *pf;
-   // int bufferSize = 512;
-   // char initialBuffer[bufferSize];
+#define NAME(ERR) \
+   case ERR:      \
+      return #ERR;
+   switch (value)
+   {
+      NAME(lbrackets)
+      NAME(asterisk)
+      NAME(lparent)
+      NAME(comma)
+      NAME(colon)
+      NAME(rparent)
+      NAME(rbraces)
+      NAME(percent)
+      NAME(lbraces)
+      NAME(plusSign)
+      NAME(rbrackets)
+      NAME(backslash)
+      NAME(arrow)
+      NAME(equality)
+      NAME(orSign)
+      NAME(andSign)
+      NAME(greaterOrEqual)
+      NAME(notEqual)
+      NAME(lessOrEqual)
+      NAME(semicolon)
+      NAME(exclamation)
+      NAME(assignment)
+      NAME(ampersand)
+      NAME(great)
+      NAME(minusSign)
+      NAME(verticalPipe)
+      NAME(lessSign)
+      NAME(slash)
+      NAME(dot)
+      NAME(EOF)
+      NAME(identifier)
+      NAME(literal)
+      NAME(numInt)
+      NAME(numFloat)
+      NAME(int_)
+      NAME(float_)
+      NAME(bool_)
+      NAME(char_)
+      NAME(double_)
+      NAME(long_)
+      NAME(if_)
+      NAME(else_)
+      NAME(while_)
+      NAME(switch_)
+      NAME(case_)
+      NAME(break_)
+      NAME(print_)
+      NAME(readln_)
+      NAME(return_)
+      NAME(throw_)
+      NAME(try_)
+      NAME(catch_)
+      NAME(true_)
+      NAME(false_)
+      NAME(typedef_)
+      NAME(struct_)
+   }
+   return "unknown";
+#undef NAME
+}
 
-   // // Opening file in reading mode
-   // pf = fopen("test.txt", "r");
+int main(int argc, char **argv)
+{
 
-   // if (NULL == pf)
-   // {
-   //    printf("file can't be opened \n");
-   // }
-   // // ode would stop reading as soon as fread extracts anything other than 1 element.
-   // // Le em initialBuffer o valor da variável armazenada anteriormente pf
+   double time_spent = 0.0;
 
-   // while (fread(&initialBuffer, sizeof *initialBuffer, bufferSize, pf) > 1)
-   // {
-   //    lexical *lex = lexical_construct(reservedWordsOflanguage);
-   //    char *token;
-   //    int tam = 0;
+   clock_t begin = clock();
 
-   //    while (initialBuffer[tam] != '\0')
-   //    {
-   //       // printf("char %s \n", &initialBuffer[tam]);
-   //       char t = initialBuffer[tam];
-   //       printf("INITIAL BUYC %c \n", t);
-   //       char *entry = &t;
-   //       printf("entry %s", entry);
-   //       token = nextToken(lex, entry);
-   //       tam++;
+   char *fileName;
+   int readFromFile;
+   if (argc > 1)
+   {
+      fileName = argv[1];
+      size_t const size = strlen(fileName);
+      if (fileName[size - 1] != 'm' && fileName[size - 2] != 'm' && fileName[size - 3] != 'c')
+      {
+         char *con = (char *)malloc(size + 4);
+         strcpy(con, fileName);
+         strcat(con, ".cmm");
+         fileName = con;
+      }
+      readFromFile = 1;
+   }
+   else
+   {
+      char *text = (char *)calloc(1, 1), buffer[BUFFERSIZE];
+      printf("You need to press enter twice to exit \n");
+      printf("Enter with your text: \n");
+      while (*(fgets(buffer, BUFFERSIZE, stdin)) != '\n') /* break with ^\n */
+      {
+         text = (char *)realloc(text, strlen(text) + 1 + strlen(buffer));
+         strcat(text, buffer); /* note a '\n' is appended here everytime */
+      }
+      printf("\nyour input:\n%s", text);
+      fileName = text;
+      readFromFile = 0;
+   }
+   lexical *lex = lexical_construct(reservedWordsOflanguage, fileName, readFromFile);
 
-   //       if (token != NULL)
-   //       {
-   //          printf("O TOKEN: %s \n", token);
-   //          // printf("lexema %s \n", lexeme);
-   //       }
-   //       else
-   //          continue;
-   //    }
+   int token = 0;
+   while (token != EOF)
+   {
+      token = nextToken(lex);
+      if (token != -100)
+      {
+         const char *tName = getTokenName(token);
+         if (token == 31 || token == 32 || token == 33 || token == 34)
+         {
+            char *s = searchAndGetString(lex, token, getLexeme(lex));
+            printf("%s.%s \n", tName, s);
+         }
 
-   //    // Imprime o conteúdo, se existir, do arquivo informado
-   //    printf("\nO CONTEÚDO DO ARQUIVO É:\n %s \n", initialBuffer);
-   // }
+         else
+         {
+            printf("%s \n", tName);
+         }
+      }
+   }
+   clock_t end = clock();
+   time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 
-   // fclose(pf);
+   printAllTables(lex);
+   lexical_destruct(lex);
+   printf("The elapsed time is %f seconds \n", time_spent);
 
-   lexical *lex = lexical_construct(reservedWordsOflanguage);
-   readFile(lex);
    return 0;
 }
