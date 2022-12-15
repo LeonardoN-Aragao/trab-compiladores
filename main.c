@@ -134,6 +134,7 @@ int main(int argc, char **argv)
          }
       }
    }
+   printf("\n");
    clock_t end = clock();
    time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 
