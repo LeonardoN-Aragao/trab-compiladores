@@ -1,29 +1,22 @@
-Type ::= ID
+Type -> ID
+
+CADE ?
+Stmt -> expr
 
 isExpr()
-isStmt()
 
-STMT ::= while ( Expr ) STMT
-STMT ::= switch ( Expr ) { CaseBlock }
-STMT ::= break ;
-STMT ::= { STMTL }
-STMT -> print ( ExprList ) ;
-STMT ::= readln ( Expr ) ;
-STMT ::= return Expr ;
-STMT ::= throw ;
-STMT ::= try STMT catch ( ... ) STMT
-STMT ::= id FatId ;
-STMT::= if ( Expr ) Cmd Else
 
 // falta arrumar o F
-F ::= ( Expr )
-F ::= id
-F ::= num
-F ::= literal
+F -> ( Expr )
+F -> id
+F -> num
+F -> literal
 
 // -------------------------------
 
+Lembrar de sempre verificar se o identificador foi criado (pesquisar na tabela)
+
 - Adicionar e pesquisar na tabela IDS
 - Adicionar os erros
-- Criar arvore de sintaxe abstrata
-- Adicionar padrão visitor a arvore
+- Criar Arvore de Sintaxe Abstrata (para ajudar nos statements) -> https://duckduckgo.com/?t=ffab&q=how+to+build+abstract+sintax+tree+for+C&atb=v263-1&ia=web
+- Adicionar padrão visitor na arvore

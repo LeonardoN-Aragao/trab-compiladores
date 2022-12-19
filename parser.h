@@ -1,0 +1,12 @@
+void Stmt();
+void StmtList();
+void Expr9();
+void Cmd();
+void ExprList();
+void ExprListTail();
+void FormalRest();
+void FormaList();
+void Array();
+void IdList();
+void IdListAux();
+void CaseBlock();

@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include "parser.h"
 #include "lexic.h"
+#include "errorManager.h"
 
 // ------------ REMOVER ??? ---------------
 
@@ -12,7 +14,8 @@ void advance() { token = nextToken(lex); }
 void eat(int t) {if (token == t) advance(); else error();}
 
 int isType() {
-    if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_ || token == identifier)
+    if(token == int_ || token == float_ || token == bool_ || token == char_ || 
+        token == double_ || token == long_ || token == identifier)
         return 1;
     return 0;
 }
@@ -24,7 +27,9 @@ int isExpr(){
 }
 
 int isStmt(){
-    if(1)
+    if(token == if_ || token == while_ || token == switch_ || token == lbraces ||
+        token == print_ || token == readln_ || token == return_ || token == throw_ ||
+        token == try_ || token == identifier || token == break_)
         return 1;
     return 0;
 }
@@ -227,7 +232,7 @@ void Expr5() {
 void Expr4Aux() {
     if(token == ampersand){
         Expr5(); 
-        ExprAux4();
+        Expr4Aux();
     }
     else return;
 }
@@ -306,6 +311,118 @@ void Else(){
     else return;
 }
 
+// StmtList -> Stmt StmtList
+// StmtList -> ''
+void StmtList(){
+    if(isStmt()){
+        Stmt(); 
+        StmtList();
+    }
+    else return;
+}
+
+// Stmt-> if ( Expr ) Cmd Else
+// Stmt -> return Expr ;
+// Stmt -> while ( Expr ) { Stmt }
+// Stmt -> switch ( Expr ) { CaseBlock }
+// Stmt -> break ;
+// Stmt -> { StmtList }
+// Stmt -> print ( ExprList ) ;
+// Stmt -> readln ( Expr ) ;
+// Stmt -> throw ;
+// Stmt -> try Stmt catch ( ... ) Stmt
+// Stmt -> id FatId ;
+void Stmt(){
+    switch (token){
+        case if_:
+            eat(if_);
+            eat(lparent);
+            Expr();
+            eat(rparent);
+            Cmd();
+            Else();
+            break;
+
+        case while_:
+            eat(while_);
+            eat(lparent);
+            Expr();
+            eat(rparent);
+            eat(lbraces);
+            Stmt();
+            eat(rbraces);
+            break;
+
+        case switch_:
+            eat(switch_);
+            eat(lparent);
+            Expr();
+            eat(rparent);
+            eat(lbraces);
+            CaseBlock();
+            eat(rbraces);
+            break;
+
+        case break_:
+            eat(break_);
+            eat(semicolon);
+            break;
+
+        case lbraces:
+            eat(lbrackets);
+            StmtList();
+            eat(rbrackets);
+            break;
+        
+        case print_:
+            eat(print_);
+            eat(lparent);
+            ExprList();
+            eat(rparent);
+            eat(semicolon);
+            break;
+        
+        case readln_:
+            eat(print_);
+            eat(lparent);
+            Expr();
+            eat(rparent);
+            eat(semicolon);
+            break;
+
+        case return_:
+            eat(return_);
+            Expr();
+            eat(semicolon);
+            break;
+        
+        case throw_:
+            eat(throw_);
+            eat(semicolon);
+            break;
+        
+        // AQUI -------------------------------------------------------------
+        case try_:
+            eat(try_);
+            Stmt();
+            eat(catch_);
+            eat(lparent);
+            Stmt();
+            eat(rparent);
+            Stmt();
+            break;
+        
+        case identifier:
+            eat(identifier);
+            FatId();
+            eat(semicolon);
+            break;
+
+    default:
+        error();
+    }
+}
+
 // FatId1 -> dot Expr
 // FatId1 -> arrow Expr
 // FatId1 -> = Expr
@@ -368,21 +485,6 @@ void FatId(){
             break;
     }
 }
-
-void Stmt(){
-
-}
-
-// StmtList -> Stmt StmtList
-// StmtList -> ''
-void StmtList(){
-    if(isStmt()){
-        Stmt(); 
-        StmtList();
-    }
-    else return;
-}
-
 
 // Pointer -> asterisk
 // Pointer -> ''
@@ -475,14 +577,14 @@ void ExprOrCall() {
 }
 
 
-// CaseBlock -> case num : StmtL CaseBlock
+// CaseBlock -> case num : StmtList CaseBlock
 // CaseBlock -> ''
 void CaseBlock() {
     if(token == case_){
         eat(case_);
         eat(numInt);
         eat(colon);
-        StmtL();
+        StmtList();
         CaseBlock();
     }
     else return;
@@ -526,7 +628,7 @@ void TypeDecl(){
     TypeDecl();
 }
 
-// FunctionalDecl -> Type Pointer id ( FormaList ) { StmtL }
+// FunctionalDecl -> Type Pointer id ( FormaList ) { StmtList }
 void FunctionalDecl() {
     Type();
     Pointer();
@@ -535,7 +637,7 @@ void FunctionalDecl() {
     FormaList();
     eat(rparent);
     eat(lbraces);
-    StmtL();
+    StmtList();
     eat(rbraces);
 }
 
