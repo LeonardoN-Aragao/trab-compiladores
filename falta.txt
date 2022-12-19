@@ -1,0 +1,29 @@
+Type ::= ID
+
+isExpr()
+isStmt()
+
+STMT ::= while ( Expr ) STMT
+STMT ::= switch ( Expr ) { CaseBlock }
+STMT ::= break ;
+STMT ::= { STMTL }
+STMT -> print ( ExprList ) ;
+STMT ::= readln ( Expr ) ;
+STMT ::= return Expr ;
+STMT ::= throw ;
+STMT ::= try STMT catch ( ... ) STMT
+STMT ::= id FatId ;
+STMT::= if ( Expr ) Cmd Else
+
+// falta arrumar o F
+F ::= ( Expr )
+F ::= id
+F ::= num
+F ::= literal
+
+// -------------------------------
+
+- Adicionar e pesquisar na tabela IDS
+- Adicionar os erros
+- Criar arvore de sintaxe abstrata
+- Adicionar padrão visitor a arvore

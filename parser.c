@@ -8,11 +8,23 @@ int token = 0;
 
 // ----------------------------------------
 
-void advance() { token = nextToken(); }
+void advance() { token = nextToken(lex); }
 void eat(int t) {if (token == t) advance(); else error();}
 
 int isType() {
-    if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_)
+    if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_ || token == identifier)
+        return 1;
+    return 0;
+}
+
+int isExpr(){
+    if(1)
+        return 1;
+    return 0;
+}
+
+int isStmt(){
+    if(1)
         return 1;
     return 0;
 }
@@ -32,13 +44,13 @@ void Num(){
     }
 }
 
-// Type -> long;
-// Type -> int;
-// Type -> float;
-// Type -> bool;
-// Type -> ID;
-// Type -> char;
-// Type -> double;
+// Type -> long
+// Type -> int
+// Type -> float
+// Type -> bool
+// Type -> ID
+// Type -> char
+// Type -> double
 void Type(){
     if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_)
         advance();
@@ -46,26 +58,333 @@ void Type(){
         error();
 }
 
+void F(){
+
+}
+
+// Expr9Aux -> plusUnary Expr9
+// Expr9Aux -> minusUnary Expr9
+// Expr9Aux -> notUnary Expr9
+// Expr9Aux -> ''
+void Expr9Aux() {
+    switch(token){
+        case plusSign:
+            eat(plusSign);
+            Expr9();
+            break;
+
+        case minusSign:
+            eat(minusSign);
+            Expr9();
+            break;
+
+        case exclamation:
+            eat(exclamation);
+            Expr9();
+            break;
+
+        default:    
+            return;
+    }
+}
+
+// Expr9 -> F Expr9Aux
+void Expr9() {
+    F(); Expr9Aux();
+}
+
+// Expr8Aux -> * Expr9 Expr8Aux
+// Expr8Aux -> / Expr9 Expr8Aux
+// Expr8Aux -> % Expr9 Expr8Aux
+// Expr8Aux -> ''
+void Expr8Aux() {
+     switch(token){
+        case asterisk:
+            eat(asterisk);
+            Expr9();
+            Expr8Aux();
+            break;
+
+        case slash:
+            eat(slash);
+            Expr9();
+            Expr8Aux();
+            break;
+
+        case percent:
+            eat(percent);
+            Expr9();
+            Expr8Aux();
+            break;
+
+        default:    
+            return;
+    }
+}
+
+// Expr8 -> Expr9 Expr8Aux
+void Expr8() {
+    Expr9(); Expr8Aux();
+}
+
+// Expr7Aux -> + Expr8 Expr7Aux
+// Expr7Aux -> - Expr8 Expr7Aux
+// Expr7Aux -> ''
+void Expr7Aux() {
+    switch(token){
+        case plusSign:
+            eat(plusSign);
+            Expr8();
+            Expr7Aux();
+            break;
+
+        case minusSign:
+            eat(minusSign);
+            Expr8();
+            Expr7Aux();
+            break;
+
+        default:    
+            return;
+    }
+}
+
+// Expr7 -> Expr8 Expr7Aux
+void Expr7() {
+    Expr8(); Expr7Aux();
+}
+
+// Expr6Aux -> < Expr7 Expr6Aux
+// Expr6Aux -> > Expr7 Expr6Aux
+// Expr6Aux -> <= Expr7 Expr6Aux
+// Expr6Aux -> >= Expr7 Expr6Aux
+// Expr6Aux -> ''
+void Expr6Aux() {
+    switch(token){
+        case lessSign:
+            eat(lessSign);
+            Expr7();
+            Expr6Aux();
+            break;
+
+        case great:
+            eat(great);
+            Expr7();
+            Expr6Aux();
+            break;
+        
+        case lessOrEqual:
+            eat(lessOrEqual);
+            Expr7();
+            Expr6Aux();
+            break;
+
+        case greaterOrEqual:
+            eat(greaterOrEqual);
+            Expr7();
+            Expr6Aux();
+            break;
+
+        default:    
+            return;
+    }
+}
+
+// Expr6 -> Expr7 Expr6Aux
+void Expr6() {
+    Expr7(); Expr6Aux();
+}
+
+// Expr5Aux -> == Expr6 Expr5Aux
+// Expr5Aux -> != Expr6 Expr5Aux
+// Expr5Aux -> ''
+void Expr5Aux() {
+    switch(token){
+        case equality:
+            eat(equality);
+            Expr6();
+            Expr5Aux();
+            break;
+
+        case notEqual:
+            eat(notEqual);
+            Expr6();
+            Expr5Aux();
+            break;
+
+        default:    
+            return;
+    }
+}
+
+// Expr5 -> Expr6 Expr5Aux
+void Expr5() {
+    Expr6(); Expr5Aux();
+}
+
+// Expr4Aux -> & Expr5 Expr4Aux
+// Expr4Aux -> ''
+void Expr4Aux() {
+    if(token == ampersand){
+        Expr5(); 
+        ExprAux4();
+    }
+    else return;
+}
+
+// Expr4 -> Expr5 Expr4Aux
+void Expr4() {
+    Expr5(); Expr4Aux();
+}
+
+
+// Expr3Aux -> | Expr4 Expr3Aux
+// Expr3Aux -> ''
+void Expr3Aux() {
+    if(token == verticalPipe){
+        Expr4(); 
+        Expr3Aux();
+    }
+    else return;
+}
+
+// Expr3 -> Expr4 Expr3Aux
+void Expr3() {
+    Expr4(); Expr3Aux();
+}
+
+// Expr2Aux -> && Expr3 Expr2Aux
+// Expr2Aux -> ''
+void Expr2Aux() {
+    if(token == andSign){
+        Expr3(); 
+        Expr2Aux();
+    }
+    else return;
+}
+
+// Expr2 -> Expr3 Expr2Aux
+void Expr2() {
+    Expr3(); Expr2Aux();
+}
+
+// ExprAux -> || Expr2 ExprAux
+// ExprAux -> ''
+void ExprAux(){
+    if(token == orSign){
+        Expr2(); 
+        ExprAux();
+    }
+    else return;
+}
+
+//Expr -> Expr2 ExprAux
 void Expr(){
+    Expr2(); ExprAux();
+}
+
+// Cmd -> Stmt
+// Cmd ->{ StmtList }
+void Cmd(){
+    if(isStmt())
+        Stmt();
+    else if(token == lbraces){
+        eat(lbraces);
+        StmtList();
+        eat(rbraces);
+    }
+    else error();
+}
+
+// Else-> else Cmd
+// Else-> ''
+void Else(){
+    if(token == else_){
+        eat(else_);
+        Cmd();
+    }
+    else return;
+}
+
+// FatId1 -> dot Expr
+// FatId1 -> arrow Expr
+// FatId1 -> = Expr
+// FatId1 -> [ Expr ]
+void FatId1(){
+    switch (token){
+        case dot:
+            eat(dot);
+            Expr();
+            break;
+
+        case arrow:
+            eat(arrow);
+            Expr();
+            break;
+
+        case assignment:
+            eat(assignment);
+            Expr();
+            break;
+
+        case lbrackets:
+            eat(lbrackets);
+            Expr();
+            eat(rbrackets);
+            break;
+
+    default:
+        error();
+    }
+}
+
+// FatId -> ( ExprList  )
+// FatId ->  IdList ; STMT
+// FatId -> FatId1
+// FatId -> ''
+void FatId(){
+    switch(token){
+        case lparent:
+            eat(lparent);
+            ExprList();
+            eat(rparent);
+            break;
+
+        case asterisk:
+        case identifier:
+            IdList();
+            eat(semicolon);
+            Stmt();
+            break;
+
+        case dot:
+        case arrow:
+        case assignment:
+        case lbrackets:
+            FatId1();
+            break;
+         
+        default:
+            break;
+    }
+}
+
+void Stmt(){
 
 }
 
-void STMT(){
-
-}
-
-// STMTList ::= STMT STMTList
-// STMTList ::= ''
-void STMTList(){
-    if(isSTMT()){
-        STMT(); 
-        STMTList();
+// StmtList -> Stmt StmtList
+// StmtList -> ''
+void StmtList(){
+    if(isStmt()){
+        Stmt(); 
+        StmtList();
     }
     else return;
 }
 
 
-// Pointer -> asterisk;
+// Pointer -> asterisk
 // Pointer -> ''
 void Pointer() {
     if(token == asterisk) advance();
@@ -84,16 +403,8 @@ void VarDecl(){
     VarDecl();
 }
 
-// IdList ::= Pointer id Array IdList'
-void IdList() {
-    Pointer();
-    eat(identifier);
-    Array();
-    IdListAux();
-}
-
-// IdList' ::= , IdList
-// IdList' ::= ''
+// IdList' -> , IdList
+// IdList' -> ''
 void IdListAux(){
     if(token == comma){
         eat(comma);
@@ -102,8 +413,16 @@ void IdListAux(){
     else return;
 }
 
-// FormalRest ::= , FormaList
-// FormalRest ::= ''
+// IdList -> Pointer id Array IdList'
+void IdList() {
+    Pointer();
+    eat(identifier);
+    Array();
+    IdListAux();
+}
+
+// FormalRest -> , FormaList
+// FormalRest -> ''
 void FormalRest() {
     if(token == comma){
         eat(comma); 
@@ -112,8 +431,8 @@ void FormalRest() {
     else return;
 }
 
-// FormaList ::= Type Pointer id Array FormalRest
-// FormaList ::= ''
+// FormaList -> Type Pointer id Array FormalRest
+// FormaList -> ''
 void FormaList() {
     if(isType()){
         Type();
@@ -125,8 +444,8 @@ void FormaList() {
     else return;
 }    
 
-// Array ::= [ Num ] Array
-// Array ::= ''
+// Array -> [ Num ] Array
+// Array -> ''
 void Array() {
     if(token == lbrackets){
         eat(lbrackets);
@@ -137,8 +456,8 @@ void Array() {
     else return;
 }
 
-// ExprOrCall' ::= ( ExprList  ) ;
-// ExprOrCall' ::= ''
+// ExprOrCall' -> ( ExprList  )
+// ExprOrCall' -> ''
 void ExprOrCallAux(){
     if(token == lparent){
         eat(lparent);
@@ -148,27 +467,29 @@ void ExprOrCallAux(){
     else return;
 }
 
-// ExprOrCall ::= A ExprOrCall' ;
+// ExprOrCall -> Expr ExprOrCall'
 void ExprOrCall() {
-
+    Expr();
+    ExprOrCallAux();
+    eat(semicolon);
 }
 
 
-// CaseBlock ::= case num : STMTL CaseBlock
-// CaseBlock ::= ''
+// CaseBlock -> case num : StmtL CaseBlock
+// CaseBlock -> ''
 void CaseBlock() {
     if(token == case_){
         eat(case_);
         eat(numInt);
         eat(colon);
-        STMTL();
+        StmtL();
         CaseBlock();
     }
     else return;
 }
 
-// ExprListTail' ::= , ExprListTail
-// ExprListTail' ::= ''
+// ExprListTail' -> , ExprListTail
+// ExprListTail' -> ''
 void ExprListTailAux() {
     if(token == comma){
         eat(comma);
@@ -177,16 +498,17 @@ void ExprListTailAux() {
     else return;
 }
 
-// ExprListTail ::= Expr ExprListTail'
+// ExprListTail -> Expr ExprListTail'
 // ExprListTail :: ''
 void ExprListTail() {
-    
+    Expr();
+    ExprListTailAux();
 }
 
-// ExprList ::= ExprLT
-// ExprList ::= ''
+// ExprList -> ExprListTail
+// ExprList -> ''
 void ExprList() {
-
+    ExprListTail();
 }
 
 // TypeDecl -> typedef struct { Type IdList ; VarDecl } id ; TypeDecl
@@ -204,7 +526,7 @@ void TypeDecl(){
     TypeDecl();
 }
 
-// FunctionalDecl -> Type Pointer id ( FormaList ) { STMTL }
+// FunctionalDecl -> Type Pointer id ( FormaList ) { StmtL }
 void FunctionalDecl() {
     Type();
     Pointer();
@@ -213,7 +535,7 @@ void FunctionalDecl() {
     FormaList();
     eat(rparent);
     eat(lbraces);
-    STMTL();
+    StmtL();
     eat(rbraces);
 }
 
@@ -230,6 +552,7 @@ void Program(){
         case char_:
         case double_:
         case long_:
+        case identifier:
             FunctionalDecl();
             Program();
             break;
@@ -240,6 +563,7 @@ void Program(){
             break; 
     
     default:
+        return;
         break;
     }
 }
