@@ -2,7 +2,7 @@
 
 Stack::Stack(){
     top = NULL;
-    size = 0;
+    size_ = 0;
 }
 Stack::~Stack(){
     Node * p;
@@ -20,7 +20,7 @@ int Stack::empty(){
 }
 
 int Stack::size(){
-    return size;
+    return size_;
 }
 
 Node * Stack::get_Back(){
@@ -34,7 +34,7 @@ void Stack::push_back(Node * n){
         n->setNext(top);
         top = n;
     }
-    size++;
+    size_++;
 }
 
 Node * Stack::pop_back(){
@@ -45,7 +45,7 @@ Node * Stack::pop_back(){
         top = n->getNext();
         
         n->setNext(NULL);
-        size--;
+        size_--;
         return n;
     }
 }
@@ -54,7 +54,7 @@ void Stack::print(){
     Node * p = top;
 
     while(p != NULL){
-        printf(stdout,p->info.info);
+        fprintf(stdout,"modificar estrutura");
         p = p->getNext();
     }
 }

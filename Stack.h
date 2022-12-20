@@ -7,9 +7,9 @@
 
 using namespace std;
 
-struct modificar {
+typedef struct mod {
     int info;
-};
+}modificar;
 
 class Node {
     public:
@@ -24,7 +24,7 @@ class Node {
     private:
         modificar info;
         Node * next;
-}
+};
 
 class Stack {
     public:
@@ -40,7 +40,7 @@ class Stack {
 
     private:
         Node * top;
-        int size;
+        int size_;
 };
 
 #endif // STACK_H
