@@ -286,19 +286,6 @@ void Expr(){
     Expr2(); ExprAux();
 }
 
-// Cmd -> Stmt
-// Cmd ->{ StmtList }
-void Cmd(){
-    if(isStmt())
-        Stmt();
-    else if(token == lbraces){
-        eat(lbraces);
-        StmtList();
-        eat(rbraces);
-    }
-    else error();
-}
-
 // Else-> else Cmd
 // Else-> ''
 void Else(){
