@@ -1,8 +1,3 @@
-Type -> ID
-
-
-isExpr()
-
 // falta arrumar o F
 F -> ( Expr )
 F -> id
