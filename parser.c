@@ -20,12 +20,6 @@ int isType() {
     return 0;
 }
 
-int isExpr(){
-    if(1)
-        return 1;
-    return 0;
-}
-
 int isStmt(){
     if(token == if_ || token == while_ || token == switch_ || token == lbraces ||
         token == print_ || token == readln_ || token == return_ || token == throw_ ||
@@ -34,6 +28,8 @@ int isStmt(){
     return 0;
 }
 
+//Num -> numInt
+//Num -> numFloat
 void Num(){
     switch (token){
         case numInt:
@@ -59,6 +55,8 @@ void Num(){
 void Type(){
     if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_)
         advance();
+    else if(1) //verificar tabela de simbolos
+        return;
     else
         error();
 }
@@ -307,6 +305,7 @@ void Else(){
     if(token == else_){
         eat(else_);
         Cmd();
+        //arv.add(tabela[Else])
     }
     else return;
 }
@@ -329,7 +328,7 @@ void StmtList(){
 // Stmt -> { StmtList }
 // Stmt -> print ( ExprList ) ;
 // Stmt -> readln ( Expr ) ;
-// Stmt -> throw ;
+// Stmt -> throw;
 // Stmt -> try Stmt catch ( ... ) Stmt
 // Stmt -> id FatId ;
 void Stmt(){
@@ -496,7 +495,7 @@ void Pointer() {
 // VarDecl -> Type IdList ; VarDecl
 // VarDecl -> ''
 void VarDecl(){
-    if(!isType())
+    if(!isType() || token !=identifier)
         return;
         
     Type();
@@ -546,7 +545,7 @@ void FormaList() {
     else return;
 }    
 
-// Array -> [ Num ] Array
+// Array -> [ NumInt ] Array
 // Array -> ''
 void Array() {
     if(token == lbrackets){
@@ -558,26 +557,7 @@ void Array() {
     else return;
 }
 
-// ExprOrCall' -> ( ExprList  )
-// ExprOrCall' -> ''
-void ExprOrCallAux(){
-    if(token == lparent){
-        eat(lparent);
-        ExprList();
-        eat(rparent);
-    }
-    else return;
-}
-
-// ExprOrCall -> Expr ExprOrCall'
-void ExprOrCall() {
-    Expr();
-    ExprOrCallAux();
-    eat(semicolon);
-}
-
-
-// CaseBlock -> case num : StmtList CaseBlock
+// CaseBlock -> case numInt : StmtList CaseBlock
 // CaseBlock -> ''
 void CaseBlock() {
     if(token == case_){
@@ -625,6 +605,7 @@ void TypeDecl(){
     eat(rbraces);
     eat(identifier);
     eat(semicolon);
+    //adiciona na tabela
     TypeDecl();
 }
 
@@ -642,11 +623,34 @@ void FunctionalDecl() {
 }
 
 
+
+/* 
+
+ IdList -> Pointer id Array IdList'
+
+ FunctionalDecl -> Type Pointer id ( FormaList ) { StmtList }
+ 
+ VarDecl -> Type IdList ; VarDecl
+ VarDecl -> ''
+
+
+
+
+
+Teste -> ( FunctionalDecl
+Teste -> Array IdList'
+
+Program -> Type Pointer id Test Program
+Program -> TypeDecl Program
+Program -> ''
+
+*/
+
+// Program -> VarDecl Program
 // Program -> FunctionalDecl Program
 // Program -> TypeDecl Program
 // Program -> ''
 void Program(){
-
     switch (token) {
         case int_:
         case float_:
@@ -679,7 +683,7 @@ void S() {
 
 void parser(lexical * l) {
     lex = l;
-    token = getToken();
+    token = nextToken(lex);
     S();
 }
 

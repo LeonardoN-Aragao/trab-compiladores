@@ -1,15 +1,13 @@
 Type -> ID
 
-CADE ?
-Stmt -> expr
 
 isExpr()
-
 
 // falta arrumar o F
 F -> ( Expr )
 F -> id
-F -> num
+F -> numInt
+F -> numFloat
 F -> literal
 
 // -------------------------------
