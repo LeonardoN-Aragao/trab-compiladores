@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "parser.h"
-#include "lexic.h"
 #include "errorManager.h"
 
 // ------------ REMOVER ??? ---------------
@@ -30,7 +29,7 @@ int isStmt(){
 
 //Num -> numInt
 //Num -> numFloat
-void Num(){
+AST * Num(){
     switch (token){
         case numInt:
             eat(numInt);
@@ -52,7 +51,7 @@ void Num(){
 // Type -> ID
 // Type -> char
 // Type -> double
-void Type(){
+AST * Type(){
     if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_)
         advance();
     else if(1) //verificar tabela de simbolos
@@ -61,7 +60,7 @@ void Type(){
         error();
 }
 
-void F(){
+AST * F(){
 
 }
 
@@ -69,7 +68,7 @@ void F(){
 // Expr9Aux -> minusUnary Expr9
 // Expr9Aux -> notUnary Expr9
 // Expr9Aux -> ''
-void Expr9Aux() {
+AST * Expr9Aux() {
     switch(token){
         case plusSign:
             eat(plusSign);
@@ -92,7 +91,7 @@ void Expr9Aux() {
 }
 
 // Expr9 -> F Expr9Aux
-void Expr9() {
+AST * Expr9() {
     F(); Expr9Aux();
 }
 
@@ -100,7 +99,7 @@ void Expr9() {
 // Expr8Aux -> / Expr9 Expr8Aux
 // Expr8Aux -> % Expr9 Expr8Aux
 // Expr8Aux -> ''
-void Expr8Aux() {
+AST * Expr8Aux() {
      switch(token){
         case asterisk:
             eat(asterisk);
@@ -126,14 +125,14 @@ void Expr8Aux() {
 }
 
 // Expr8 -> Expr9 Expr8Aux
-void Expr8() {
+AST * Expr8() {
     Expr9(); Expr8Aux();
 }
 
 // Expr7Aux -> + Expr8 Expr7Aux
 // Expr7Aux -> - Expr8 Expr7Aux
 // Expr7Aux -> ''
-void Expr7Aux() {
+AST * Expr7Aux() {
     switch(token){
         case plusSign:
             eat(plusSign);
@@ -153,7 +152,7 @@ void Expr7Aux() {
 }
 
 // Expr7 -> Expr8 Expr7Aux
-void Expr7() {
+AST * Expr7() {
     Expr8(); Expr7Aux();
 }
 
@@ -162,7 +161,7 @@ void Expr7() {
 // Expr6Aux -> <= Expr7 Expr6Aux
 // Expr6Aux -> >= Expr7 Expr6Aux
 // Expr6Aux -> ''
-void Expr6Aux() {
+AST * Expr6Aux() {
     switch(token){
         case lessSign:
             eat(lessSign);
@@ -194,14 +193,14 @@ void Expr6Aux() {
 }
 
 // Expr6 -> Expr7 Expr6Aux
-void Expr6() {
+AST * Expr6() {
     Expr7(); Expr6Aux();
 }
 
 // Expr5Aux -> == Expr6 Expr5Aux
 // Expr5Aux -> != Expr6 Expr5Aux
 // Expr5Aux -> ''
-void Expr5Aux() {
+AST * Expr5Aux() {
     switch(token){
         case equality:
             eat(equality);
@@ -221,13 +220,13 @@ void Expr5Aux() {
 }
 
 // Expr5 -> Expr6 Expr5Aux
-void Expr5() {
+AST * Expr5() {
     Expr6(); Expr5Aux();
 }
 
 // Expr4Aux -> & Expr5 Expr4Aux
 // Expr4Aux -> ''
-void Expr4Aux() {
+AST * Expr4Aux() {
     if(token == ampersand){
         Expr5(); 
         Expr4Aux();
@@ -236,14 +235,13 @@ void Expr4Aux() {
 }
 
 // Expr4 -> Expr5 Expr4Aux
-void Expr4() {
+AST * Expr4() {
     Expr5(); Expr4Aux();
 }
 
-
 // Expr3Aux -> | Expr4 Expr3Aux
 // Expr3Aux -> ''
-void Expr3Aux() {
+AST * Expr3Aux() {
     if(token == verticalPipe){
         Expr4(); 
         Expr3Aux();
@@ -252,13 +250,13 @@ void Expr3Aux() {
 }
 
 // Expr3 -> Expr4 Expr3Aux
-void Expr3() {
+AST * Expr3() {
     Expr4(); Expr3Aux();
 }
 
 // Expr2Aux -> && Expr3 Expr2Aux
 // Expr2Aux -> ''
-void Expr2Aux() {
+AST * Expr2Aux() {
     if(token == andSign){
         Expr3(); 
         Expr2Aux();
@@ -267,13 +265,13 @@ void Expr2Aux() {
 }
 
 // Expr2 -> Expr3 Expr2Aux
-void Expr2() {
+AST * Expr2() {
     Expr3(); Expr2Aux();
 }
 
 // ExprAux -> || Expr2 ExprAux
 // ExprAux -> ''
-void ExprAux(){
+AST * ExprAux(){
     if(token == orSign){
         Expr2(); 
         ExprAux();
@@ -282,24 +280,23 @@ void ExprAux(){
 }
 
 //Expr -> Expr2 ExprAux
-void Expr(){
+AST * Expr(){
     Expr2(); ExprAux();
 }
 
-// Else-> else Cmd
+// Else-> else Stmt
 // Else-> ''
-void Else(){
+AST * Else(){
     if(token == else_){
         eat(else_);
-        Cmd();
-        //arv.add(tabela[Else])
+        Stmt();
     }
     else return;
 }
 
 // StmtList -> Stmt StmtList
 // StmtList -> ''
-void StmtList(){
+AST * StmtList(){
     if(isStmt()){
         Stmt(); 
         StmtList();
@@ -307,7 +304,7 @@ void StmtList(){
     else return;
 }
 
-// Stmt-> if ( Expr ) Cmd Else
+// Stmt -> if ( Expr ) Cmd Else
 // Stmt -> return Expr ;
 // Stmt -> while ( Expr ) { Stmt }
 // Stmt -> switch ( Expr ) { CaseBlock }
@@ -316,9 +313,9 @@ void StmtList(){
 // Stmt -> print ( ExprList ) ;
 // Stmt -> readln ( Expr ) ;
 // Stmt -> throw;
-// Stmt -> try Stmt catch ( ... ) Stmt
+// Stmt -> try Stmt catch ( Stmt ) Stmt
 // Stmt -> id FatId ;
-void Stmt(){
+AST * Stmt(){
     switch (token){
         case if_:
             eat(if_);
@@ -387,7 +384,6 @@ void Stmt(){
             eat(semicolon);
             break;
         
-        // AQUI -------------------------------------------------------------
         case try_:
             eat(try_);
             Stmt();
@@ -413,7 +409,7 @@ void Stmt(){
 // FatId1 -> arrow Expr
 // FatId1 -> = Expr
 // FatId1 -> [ Expr ]
-void FatId1(){
+AST * FatId1(){
     switch (token){
         case dot:
             eat(dot);
@@ -445,7 +441,7 @@ void FatId1(){
 // FatId ->  IdList ; STMT
 // FatId -> FatId1
 // FatId -> ''
-void FatId(){
+AST * FatId(){
     switch(token){
         case lparent:
             eat(lparent);
@@ -474,14 +470,14 @@ void FatId(){
 
 // Pointer -> asterisk
 // Pointer -> ''
-void Pointer() {
+AST * Pointer() {
     if(token == asterisk) advance();
     else return;
 }
 
 // VarDecl -> Type IdList ; VarDecl
 // VarDecl -> ''
-void VarDecl(){
+AST * VarDecl(){
     if(!isType() || token !=identifier)
         return;
         
@@ -493,7 +489,7 @@ void VarDecl(){
 
 // IdList' -> , IdList
 // IdList' -> ''
-void IdListAux(){
+AST * IdListAux(){
     if(token == comma){
         eat(comma);
         IdList();
@@ -502,7 +498,7 @@ void IdListAux(){
 }
 
 // IdList -> Pointer id Array IdList'
-void IdList() {
+AST * IdList() {
     Pointer();
     eat(identifier);
     Array();
@@ -511,7 +507,7 @@ void IdList() {
 
 // FormalRest -> , FormaList
 // FormalRest -> ''
-void FormalRest() {
+AST * FormalRest() {
     if(token == comma){
         eat(comma); 
         FormaList();
@@ -521,7 +517,7 @@ void FormalRest() {
 
 // FormaList -> Type Pointer id Array FormalRest
 // FormaList -> ''
-void FormaList() {
+AST * FormaList() {
     if(isType()){
         Type();
         Pointer();
@@ -534,7 +530,7 @@ void FormaList() {
 
 // Array -> [ NumInt ] Array
 // Array -> ''
-void Array() {
+AST * Array() {
     if(token == lbrackets){
         eat(lbrackets);
         eat(numInt);
@@ -546,7 +542,7 @@ void Array() {
 
 // CaseBlock -> case numInt : StmtList CaseBlock
 // CaseBlock -> ''
-void CaseBlock() {
+AST * CaseBlock() {
     if(token == case_){
         eat(case_);
         eat(numInt);
@@ -559,7 +555,7 @@ void CaseBlock() {
 
 // ExprListTail' -> , ExprListTail
 // ExprListTail' -> ''
-void ExprListTailAux() {
+AST * ExprListTailAux() {
     if(token == comma){
         eat(comma);
         ExprListTail();
@@ -569,19 +565,19 @@ void ExprListTailAux() {
 
 // ExprListTail -> Expr ExprListTail'
 // ExprListTail :: ''
-void ExprListTail() {
+AST * ExprListTail() {
     Expr();
     ExprListTailAux();
 }
 
 // ExprList -> ExprListTail
 // ExprList -> ''
-void ExprList() {
+AST * ExprList() {
     ExprListTail();
 }
 
 // TypeDecl -> typedef struct { Type IdList ; VarDecl } id ; TypeDecl
-void TypeDecl(){
+AST * TypeDecl(){
     eat(typedef_);
     eat(struct_);
     eat(lbraces);
@@ -597,7 +593,7 @@ void TypeDecl(){
 }
 
 // FunctionalDecl -> Type Pointer id ( FormaList ) { StmtList }
-void FunctionalDecl() {
+AST * FunctionalDecl() {
     Type();
     Pointer();
     eat(identifier);
@@ -609,35 +605,11 @@ void FunctionalDecl() {
     eat(rbraces);
 }
 
-
-
-/* 
-
- IdList -> Pointer id Array IdList'
-
- FunctionalDecl -> Type Pointer id ( FormaList ) { StmtList }
- 
- VarDecl -> Type IdList ; VarDecl
- VarDecl -> ''
-
-
-
-
-
-Teste -> ( FunctionalDecl
-Teste -> Array IdList'
-
-Program -> Type Pointer id Test Program
-Program -> TypeDecl Program
-Program -> ''
-
-*/
-
 // Program -> VarDecl Program
 // Program -> FunctionalDecl Program
 // Program -> TypeDecl Program
 // Program -> ''
-void Program(){
+AST * Program(){
     switch (token) {
         case int_:
         case float_:
@@ -661,16 +633,17 @@ void Program(){
     }
 }
 
-void S() {
-    Program();
+AST * S() {
+    AST * r = Program();
     eat(EOF);
+    return r;
 }
 
 // ---------------------------------------
 
-void parser(lexical * l) {
+AST * parser(lexical * l) {
     lex = l;
     token = nextToken(lex);
-    S();
+    return S();
 }
 

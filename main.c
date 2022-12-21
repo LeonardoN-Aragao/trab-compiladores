@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lexic.h"
 #include <time.h>
+#include "lexic.h"
+#include "AST.h"
+#include "parser.h"
+
 
 char *reservedWordsOflanguage[] = {"int", "float", "bool", "char", "double",
                                    "long", "if", "else", "while", "switch", "case", "break", "print",
@@ -115,31 +118,33 @@ int main(int argc, char **argv)
    }
    lexical *lex = lexical_construct(reservedWordsOflanguage, fileName, readFromFile);
 
-   int token = 0;
-   while (token != EOF)
-   {
-      token = nextToken(lex);
-      if (token != -100)
-      {
-         const char *tName = getTokenName(token);
-         if (token == 31 || token == 32 || token == 33 || token == 34)
-         {
-            char *s = searchAndGetString(lex, token, getLexeme(lex));
-            printf("%s.%s \n", tName, s);
-         }
+   AST * a = parser(lex);
 
-         else
-         {
-            printf("%s \n", tName);
-         }
-      }
-   }
-   printf("\n");
+   // int token = 0;
+   // while (token != EOF)
+   // {
+   //    token = nextToken(lex);
+   //    if (token != -100)
+   //    {
+   //       const char *tName = getTokenName(token);
+   //       if (token == 31 || token == 32 || token == 33 || token == 34)
+   //       {
+   //          char *s = searchAndGetString(lex, token, getLexeme(lex));
+   //          printf("%s.%s \n", tName, s);
+   //       }
+
+   //       else
+   //       {
+   //          printf("%s \n", tName);
+   //       }
+   //    }
+   // }
+   // printf("\n");
    clock_t end = clock();
    time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
 
-   printAllTables(lex);
-   lexical_destruct(lex);
+   // printAllTables(lex);
+   // lexical_destruct(lex);
    printf("The elapsed time is %f seconds \n", time_spent);
 
    return 0;

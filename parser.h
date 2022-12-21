@@ -1,11 +1,16 @@
-void Stmt();
-void StmtList();
-void Expr9();
-void ExprList();
-void ExprListTail();
-void FormalRest();
-void FormaList();
-void Array();
-void IdList();
-void IdListAux();
-void CaseBlock();
+#include "lexic.h"
+#include "AST.h"
+
+
+AST * parser(lexical * l);
+AST * Stmt();
+AST * StmtList();
+AST * Expr9();
+AST * ExprList();
+AST * ExprListTail();
+AST * FormalRest();
+AST * FormaList();
+AST * Array();
+AST * IdList();
+AST * IdListAux();
+AST * CaseBlock();
