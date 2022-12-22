@@ -13,8 +13,8 @@ typedef struct mod {
 
 class Node {
     public:
-        Node() { next == NULL; }
-        ~Node();
+        Node() { this->next == nullptr; }
+        ~Node() { delete next; };
 
         void setInfo(modificar i) { info = i; }
         modificar getInfo() { return info; }

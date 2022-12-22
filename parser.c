@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "parser.h"
-#include "errorManager.h"
+#include "lexic.h"
+//#include "errorManager.h"
 
 // ------------ REMOVER ??? ---------------
 
@@ -8,6 +9,44 @@ lexical * lex;
 int token = 0;
 
 // ----------------------------------------
+
+// Errors ------------------------------------------------
+void error() {
+  printf("Error!!!\n");
+}
+
+int inFollow(int token, int *follow) {
+    for(int i=0; i<sizeof(follow); i++) {
+        if(follow[i] == token)
+            return 0;
+    }
+    return 1;
+}
+
+int inFirst(int token, int *first) {
+    for(int i=0; i<sizeof(first); i++) {
+        if(first[i] == token)
+            return 0;
+    }
+    return 1;
+}
+// Isso para o eat
+void erro_eat(int token, int t, int *follow) {
+    if(inFollow(token, follow)) {
+        // Add t at ASA
+        // Do not consume token and continue
+        printf("If");
+    } else {
+        printf("Unexpected Token!!!");
+    }
+}
+
+void erro(int token) {
+    // STMT -> make the token an id/num and continue
+    // FatId -> verify token == +,-,... and continue
+    // Type -> add to SymbTable and continue
+}
+// -------------------------------------------------------
 
 void advance() { token = nextToken(lex); }
 void eat(int t) {if (token == t) advance(); else error();}
@@ -291,6 +330,7 @@ AST * Else(){
     if(token == else_){
         eat(else_);
         Stmt();
+        //arv.add(tabela[Else])
     }
     else return;
 }
@@ -305,7 +345,70 @@ AST * StmtList(){
     else return;
 }
 
-// Stmt -> if ( Expr ) Cmd Else
+// FatId1 -> dot Expr
+// FatId1 -> arrow Expr
+// FatId1 -> = Expr
+// FatId1 -> [ Expr ]
+void FatId1(){
+    switch (token){
+        case dot:
+            eat(dot);
+            Expr();
+            break;
+
+        case arrow:
+            eat(arrow);
+            Expr();
+            break;
+
+        case assignment:
+            eat(assignment);
+            Expr();
+            break;
+
+        case lbrackets:
+            eat(lbrackets);
+            Expr();
+            eat(rbrackets);
+            break;
+
+    default:
+        error();
+    }
+}
+
+// FatId -> ( ExprList  )
+// FatId ->  IdList ; STMT
+// FatId -> FatId1
+// FatId -> ''
+void FatId(){
+    switch(token){
+        case lparent:
+            eat(lparent);
+            ExprList();
+            eat(rparent);
+            break;
+
+        case asterisk:
+        case identifier:
+            IdList();
+            eat(semicolon);
+            Stmt();
+            break;
+
+        case dot:
+        case arrow:
+        case assignment:
+        case lbrackets:
+            FatId1();
+            break;
+         
+        default:
+            break;
+    }
+}
+
+// Stmt-> if ( Expr ) Stmt Else
 // Stmt -> return Expr ;
 // Stmt -> while ( Expr ) { Stmt }
 // Stmt -> switch ( Expr ) { CaseBlock }
@@ -323,7 +426,7 @@ AST * Stmt(){
             eat(lparent);
             Expr();
             eat(rparent);
-            Cmd();
+            Stmt();
             Else();
             break;
 
@@ -406,68 +509,6 @@ AST * Stmt(){
     }
 }
 
-// FatId1 -> dot Expr
-// FatId1 -> arrow Expr
-// FatId1 -> = Expr
-// FatId1 -> [ Expr ]
-AST * FatId1(){
-    switch (token){
-        case dot:
-            eat(dot);
-            Expr();
-            break;
-
-        case arrow:
-            eat(arrow);
-            Expr();
-            break;
-
-        case assignment:
-            eat(assignment);
-            Expr();
-            break;
-
-        case lbrackets:
-            eat(lbrackets);
-            Expr();
-            eat(rbrackets);
-            break;
-
-    default:
-        error();
-    }
-}
-
-// FatId -> ( ExprList  )
-// FatId ->  IdList ; STMT
-// FatId -> FatId1
-// FatId -> ''
-AST * FatId(){
-    switch(token){
-        case lparent:
-            eat(lparent);
-            ExprList();
-            eat(rparent);
-            break;
-
-        case asterisk:
-        case identifier:
-            IdList();
-            eat(semicolon);
-            Stmt();
-            break;
-
-        case dot:
-        case arrow:
-        case assignment:
-        case lbrackets:
-            FatId1();
-            break;
-         
-        default:
-            break;
-    }
-}
 
 // Pointer -> asterisk
 // Pointer -> ''
@@ -620,12 +661,9 @@ AST * Program(){
         case long_:
         case identifier:
 
-            struct AST * algo;
-
-            algo.FunctionDecl = FunctionalDecl();
-            algo.FunctionDecl = Program();
-
-            return algo;
+            FunctionalDecl();
+            Program();
+            break;
         
         case typedef_:
             TypeDecl();
