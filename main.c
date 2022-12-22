@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "lexic.h"
-//#include "AST.h"
+#include "AST.h"
 #include "parser.h"
 
 
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
    }
    lexical *lex = lexical_construct(reservedWordsOflanguage, fileName, readFromFile);
 
-   AST * a = parser(lex);
+   Program * a = parser(lex);
 
    // int token = 0;
    // while (token != EOF)

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "parser.h"
 #include "lexic.h"
+#include "AST.h"
 //#include "errorManager.h"
 
 // ------------ REMOVER ??? ---------------
@@ -67,9 +68,17 @@ int isStmt(){
     return 0;
 }
 
+Identifier * Parser_identifier(){
+    // adiciona na tabela
+    char * token_name = searchAndGetString(lex, token, getLexeme(lex));
+    Identifier * i = new Identifier(token_name);
+    eat(identifier);
+    return  i;
+}
+
 //Num -> numInt
 //Num -> numFloat
-AST * Num(){
+Num * Parser_Num(){
     switch (token){
         case numInt:
             eat(numInt);
@@ -91,7 +100,7 @@ AST * Num(){
 // Type -> ID
 // Type -> char
 // Type -> double
-AST * Type(){
+Type* Parser_Type(){
     if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_)
         advance();
     else if(1) //verificar tabela de simbolos
@@ -100,7 +109,7 @@ AST * Type(){
         error();
 }
 
-AST * F(){
+Expr* Parser_F(){
 
 }
 
@@ -108,7 +117,7 @@ AST * F(){
 // Expr9Aux -> minusUnary Expr9
 // Expr9Aux -> notUnary Expr9
 // Expr9Aux -> ''
-AST * Expr9Aux() {
+Expr* Expr9Aux() {
     switch(token){
         case plusSign:
             eat(plusSign);
@@ -131,15 +140,15 @@ AST * Expr9Aux() {
 }
 
 // Expr9 -> F Expr9Aux
-AST * Expr9() {
-    F(); Expr9Aux();
+Expr* Expr9() {
+    Parser_F(); Expr9Aux();
 }
 
 // Expr8Aux -> * Expr9 Expr8Aux
 // Expr8Aux -> / Expr9 Expr8Aux
 // Expr8Aux -> % Expr9 Expr8Aux
 // Expr8Aux -> ''
-AST * Expr8Aux() {
+Expr* Expr8Aux() {
      switch(token){
         case asterisk:
             eat(asterisk);
@@ -165,14 +174,14 @@ AST * Expr8Aux() {
 }
 
 // Expr8 -> Expr9 Expr8Aux
-AST * Expr8() {
+Expr* Expr8() {
     Expr9(); Expr8Aux();
 }
 
 // Expr7Aux -> + Expr8 Expr7Aux
 // Expr7Aux -> - Expr8 Expr7Aux
 // Expr7Aux -> ''
-AST * Expr7Aux() {
+Expr* Expr7Aux() {
     switch(token){
         case plusSign:
             eat(plusSign);
@@ -192,7 +201,7 @@ AST * Expr7Aux() {
 }
 
 // Expr7 -> Expr8 Expr7Aux
-AST * Expr7() {
+Expr* Expr7() {
     Expr8(); Expr7Aux();
 }
 
@@ -201,7 +210,7 @@ AST * Expr7() {
 // Expr6Aux -> <= Expr7 Expr6Aux
 // Expr6Aux -> >= Expr7 Expr6Aux
 // Expr6Aux -> ''
-AST * Expr6Aux() {
+Expr* Expr6Aux() {
     switch(token){
         case lessSign:
             eat(lessSign);
@@ -233,14 +242,14 @@ AST * Expr6Aux() {
 }
 
 // Expr6 -> Expr7 Expr6Aux
-AST * Expr6() {
+Expr* Expr6() {
     Expr7(); Expr6Aux();
 }
 
 // Expr5Aux -> == Expr6 Expr5Aux
 // Expr5Aux -> != Expr6 Expr5Aux
 // Expr5Aux -> ''
-AST * Expr5Aux() {
+Expr* Expr5Aux() {
     switch(token){
         case equality:
             eat(equality);
@@ -260,13 +269,13 @@ AST * Expr5Aux() {
 }
 
 // Expr5 -> Expr6 Expr5Aux
-AST * Expr5() {
+Expr* Expr5() {
     Expr6(); Expr5Aux();
 }
 
 // Expr4Aux -> & Expr5 Expr4Aux
 // Expr4Aux -> ''
-AST * Expr4Aux() {
+Expr* Expr4Aux() {
     if(token == ampersand){
         Expr5(); 
         Expr4Aux();
@@ -275,13 +284,13 @@ AST * Expr4Aux() {
 }
 
 // Expr4 -> Expr5 Expr4Aux
-AST * Expr4() {
+Expr* Expr4() {
     Expr5(); Expr4Aux();
 }
 
 // Expr3Aux -> | Expr4 Expr3Aux
 // Expr3Aux -> ''
-AST * Expr3Aux() {
+Expr* Expr3Aux() {
     if(token == verticalPipe){
         Expr4(); 
         Expr3Aux();
@@ -290,13 +299,13 @@ AST * Expr3Aux() {
 }
 
 // Expr3 -> Expr4 Expr3Aux
-AST * Expr3() {
+Expr* Expr3() {
     Expr4(); Expr3Aux();
 }
 
 // Expr2Aux -> && Expr3 Expr2Aux
 // Expr2Aux -> ''
-AST * Expr2Aux() {
+Expr* Expr2Aux() {
     if(token == andSign){
         Expr3(); 
         Expr2Aux();
@@ -305,13 +314,13 @@ AST * Expr2Aux() {
 }
 
 // Expr2 -> Expr3 Expr2Aux
-AST * Expr2() {
+Expr* Expr2() {
     Expr3(); Expr2Aux();
 }
 
 // ExprAux -> || Expr2 ExprAux
 // ExprAux -> ''
-AST * ExprAux(){
+Expr* ExprAux(){
     if(token == orSign){
         Expr2(); 
         ExprAux();
@@ -320,16 +329,16 @@ AST * ExprAux(){
 }
 
 //Expr -> Expr2 ExprAux
-AST * Expr(){
+Expr* Parser_Expr(){
     Expr2(); ExprAux();
 }
 
 // Else-> else Stmt
 // Else-> ''
-AST * Else(){
+Else* Parser_Else(){
     if(token == else_){
         eat(else_);
-        Stmt();
+        Parser_Stmt();
         //arv.add(tabela[Else])
     }
     else return;
@@ -337,10 +346,10 @@ AST * Else(){
 
 // StmtList -> Stmt StmtList
 // StmtList -> ''
-AST * StmtList(){
+Stmtl* Parser_StmtList(){
     if(isStmt()){
-        Stmt(); 
-        StmtList();
+        Parser_Stmt(); 
+        Parser_StmtList();
     }
     else return;
 }
@@ -349,26 +358,26 @@ AST * StmtList(){
 // FatId1 -> arrow Expr
 // FatId1 -> = Expr
 // FatId1 -> [ Expr ]
-void FatId1(){
+FatId1* Parser_FatId1(){
     switch (token){
         case dot:
             eat(dot);
-            Expr();
+            Parser_Expr();
             break;
 
         case arrow:
             eat(arrow);
-            Expr();
+            Parser_Expr();
             break;
 
         case assignment:
             eat(assignment);
-            Expr();
+            Parser_Expr();
             break;
 
         case lbrackets:
             eat(lbrackets);
-            Expr();
+            Parser_Expr();
             eat(rbrackets);
             break;
 
@@ -381,26 +390,26 @@ void FatId1(){
 // FatId ->  IdList ; STMT
 // FatId -> FatId1
 // FatId -> ''
-void FatId(){
+FatId * Parser_FatId(){
     switch(token){
         case lparent:
             eat(lparent);
-            ExprList();
+            Parser_ExprList();
             eat(rparent);
             break;
 
         case asterisk:
         case identifier:
-            IdList();
+            Parser_IdList();
             eat(semicolon);
-            Stmt();
+            Parser_Stmt();
             break;
 
         case dot:
         case arrow:
         case assignment:
         case lbrackets:
-            FatId1();
+            Parser_FatId1();
             break;
          
         default:
@@ -419,34 +428,34 @@ void FatId(){
 // Stmt -> throw;
 // Stmt -> try Stmt catch ( Stmt ) Stmt
 // Stmt -> id FatId ;
-AST * Stmt(){
+Stmt* Parser_Stmt(){
     switch (token){
         case if_:
             eat(if_);
             eat(lparent);
-            Expr();
+            Parser_Expr();
             eat(rparent);
-            Stmt();
-            Else();
+            Parser_Stmt();
+            Parser_Else();
             break;
 
         case while_:
             eat(while_);
             eat(lparent);
-            Expr();
+            Parser_Expr();
             eat(rparent);
             eat(lbraces);
-            Stmt();
+            Parser_Stmt();
             eat(rbraces);
             break;
 
         case switch_:
             eat(switch_);
             eat(lparent);
-            Expr();
+            Parser_Expr();
             eat(rparent);
             eat(lbraces);
-            CaseBlock();
+            Parser_CaseBlock();
             eat(rbraces);
             break;
 
@@ -457,14 +466,14 @@ AST * Stmt(){
 
         case lbraces:
             eat(lbrackets);
-            StmtList();
+            Parser_StmtList();
             eat(rbrackets);
             break;
         
         case print_:
             eat(print_);
             eat(lparent);
-            ExprList();
+            Parser_ExprList();
             eat(rparent);
             eat(semicolon);
             break;
@@ -472,14 +481,14 @@ AST * Stmt(){
         case readln_:
             eat(print_);
             eat(lparent);
-            Expr();
+            Parser_Expr();
             eat(rparent);
             eat(semicolon);
             break;
 
         case return_:
             eat(return_);
-            Expr();
+            Parser_Expr();
             eat(semicolon);
             break;
         
@@ -490,17 +499,17 @@ AST * Stmt(){
         
         case try_:
             eat(try_);
-            Stmt();
+            Parser_Stmt();
             eat(catch_);
             eat(lparent);
-            Stmt();
+            Parser_Stmt();
             eat(rparent);
-            Stmt();
+            Parser_Stmt();
             break;
         
         case identifier:
             eat(identifier);
-            FatId();
+            Parser_FatId();
             eat(semicolon);
             break;
 
@@ -512,146 +521,171 @@ AST * Stmt(){
 
 // Pointer -> asterisk
 // Pointer -> ''
-AST * Pointer() {
+Pointer* Parser_Pointer() {
     if(token == asterisk) advance();
     else return;
 }
 
 // VarDecl -> Type IdList ; VarDecl
 // VarDecl -> ''
-AST * VarDecl(){
+VarDecl* Parser_VarDecl(){
     if(!isType() || token !=identifier)
         return;
         
-    Type();
-    IdList();
+    Parser_Type();
+    Parser_IdList();
     eat(semicolon);
-    VarDecl();
+    Parser_VarDecl();
 }
 
 // IdList' -> , IdList
 // IdList' -> ''
-AST * IdListAux(){
+IdListAux* Parser_IdListAux(){
     if(token == comma){
         eat(comma);
-        IdList();
+        Parser_IdList();
     }
     else return;
 }
 
 // IdList -> Pointer id Array IdList'
-AST * IdList() {
-    Pointer();
+IdList* Parser_IdList() {
+    Parser_Pointer();
     eat(identifier);
-    Array();
-    IdListAux();
+    Parser_Array();
+    Parser_IdListAux();
 }
 
 // FormalRest -> , FormaList
 // FormalRest -> ''
-AST * FormalRest() {
+FormalRest* Parser_FormalRest() {
     if(token == comma){
         eat(comma); 
-        FormaList();
+        Parser_FormaList();
     }
     else return;
 }
 
 // FormaList -> Type Pointer id Array FormalRest
 // FormaList -> ''
-AST * FormaList() {
+FormaList* Parse_FormaList() {
     if(isType()){
-        Type();
-        Pointer();
+        Parser_Type();
+        Parser_Pointer();
         eat(identifier);
-        Array();
-        FormalRest();
+        Parser_Array();
+        Parser_FormalRest();
     }
     else return;
 }    
 
 // Array -> [ NumInt ] Array
 // Array -> ''
-AST * Array() {
+Array * Parser_Array() {
     if(token == lbrackets){
         eat(lbrackets);
         eat(numInt);
         eat(rbrackets);
-        Array();
+        Parser_Array();
     }
     else return;
 }
 
 // CaseBlock -> case numInt : StmtList CaseBlock
 // CaseBlock -> ''
-AST * CaseBlock() {
+CaseBlock * Parser_CaseBlock() {
     if(token == case_){
         eat(case_);
         eat(numInt);
         eat(colon);
-        StmtList();
-        CaseBlock();
+        Parser_StmtList();
+        Parser_CaseBlock();
     }
-    else return;
+    else return NULL;
 }
 
 // ExprListTail' -> , ExprListTail
 // ExprListTail' -> ''
-AST * ExprListTailAux() {
+ExprListTailAux* Parser_ExprListTailAux() {
     if(token == comma){
         eat(comma);
-        ExprListTail();
+        return new ExprListTailAux(Parser_ExprListTail());
     }
-    else return;
+    else return NULL;
 }
 
 // ExprListTail -> Expr ExprListTail'
 // ExprListTail :: ''
-AST * ExprListTail() {
-    Expr();
-    ExprListTailAux();
+ExprListTail * Parser_ExprListTail() {
+    return new ExprListTail (
+        Parser_Expr(),
+        Parser_ExprListTailAux()
+    );
 }
 
 // ExprList -> ExprListTail
 // ExprList -> ''
-AST * ExprList() {
-    ExprListTail();
+ExprList * Parser_ExprList() {
+    return new ExprList(Parser_ExprListTail());
 }
 
 // TypeDecl -> typedef struct { Type IdList ; VarDecl } id ; TypeDecl
-AST * TypeDecl(){
+TypeDecl* Parser_TypeDecl(){
     eat(typedef_);
     eat(struct_);
     eat(lbraces);
-    Type();
-    IdList();
+    Type * t = Parser_Type();
+    IdList * il = Parser_IdList();
     eat(semicolon);
-    VarDecl();
+    VarDecl * v = Parser_VarDecl();
     eat(rbraces);
-    eat(identifier);
+    Identifier * i = Parser_identifier();
     eat(semicolon);
-    //adiciona na tabela
-    TypeDecl();
+    Parser_TypeDecl();
+
+    return new TypeDecl(
+        t,il,v,i
+    );
 }
 
-// FunctionalDecl -> Type Pointer id ( FormaList ) { StmtList }
-struct AST * FunctionalDecl() {
-    Type();
-    Pointer();
-    eat(identifier);
-    eat(lparent);
-    FormaList();
-    eat(rparent);
-    eat(lbraces);
-    StmtList();
-    eat(rbraces);
+
+// ProgramL ::= Array IdList'
+// ProgramL ::= ( FormaList ) { STMTL }
+ProgramL * Parser_ProgramL(){
+    if(token == lparent){
+        eat(lparent);
+        FormaList * f = Parser_FormaList();
+        eat(rparent);
+        eat(lbraces);
+        Stmtl * s = Parser_Stmtl();
+        eat(rbraces);
+
+        return new ProgramL(f,s);
+    }
+    else{
+        return new ProgramL(Parser_Array(),Parser_IdListAux());
+    }
+}
+
+// FunctionOrVarDecl ::= Type Pointer id ProgramL Program
+FunctionOrVarDecl * Parser_FunctionOrVarDecl() {
+
+    Type * t = Parser_Type();
+    Pointer * p = Parser_Pointer();
+    Identifier * i = Parser_identifier();
+    ProgramL * pl = Parser_ProgramL();
+    Program * prog = Parser_Program();
+
+    return new FunctionOrVarDecl(
+        t,p,i,pl,prog
+    );
 }
 
 // Program -> VarDecl Program
 // Program -> FunctionalDecl Program
 // Program -> TypeDecl Program
 // Program -> ''
-AST * Program(){
+Program * Parser_Program(){
     switch (token) {
         case int_:
         case float_:
@@ -660,31 +694,26 @@ AST * Program(){
         case double_:
         case long_:
         case identifier:
-
-            FunctionalDecl();
-            Program();
-            break;
+            return new Program(Parser_FunctionOrVarDecl());
         
         case typedef_:
-            TypeDecl();
-            Program();
-            break; 
+            return new Program(Parser_TypeDecl(),Parser_Program());
     
     default:
-        return;
-        break;
+        error();
+        return NULL;
     }
 }
 
-AST * S() {
-    AST * r = Program();
+Program * S() {
+    Program * p = Parser_Program();
     eat(EOF);
-    return r;
+    return p;
 }
 
 // ---------------------------------------
 
-AST * parser(lexical * l) {
+Program * parser(lexical * l) {
     lex = l;
     token = nextToken(lex);
     return S();

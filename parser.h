@@ -1,20 +1,19 @@
 #include "lexic.h"
-//#include "AST.h"
+#include "AST.h"
 
-typedef struct AST {
-    int info;
-    AST * FunctionDecl;
-}AST;
 
-AST * parser(lexical * l);
-AST * Stmt();
-AST * StmtList();
-AST * Expr9();
-AST * ExprList();
-AST * ExprListTail();
-AST * FormalRest();
-AST * FormaList();
-AST * Array();
-AST * IdList();
-AST * IdListAux();
-AST * CaseBlock();
+Program * parser(lexical * l);
+Program* Parser_Program();
+Stmt * Parser_Stmt();
+Stmtl * Parser_Stmtl();
+Expr * Parser_Expr9();
+ExprList * Parser_ExprList();
+ExprListTail * Parser_ExprListTail();
+FormalRest * Parser_FormalRest();
+FormaList * Parser_FormaList();
+Array * Parser_Array();
+IdList * Parser_IdList();
+IdListAux * Parser_IdListAux();
+CaseBlock * Parser_CaseBlock();
+Expr * Expr9();
+ProgramL * Parser_ProgramL();
