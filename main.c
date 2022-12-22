@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "lexic.h"
-#include "AST.h"
+//#include "AST.h"
 #include "parser.h"
 
 

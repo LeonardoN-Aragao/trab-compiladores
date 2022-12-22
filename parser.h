@@ -1,6 +1,10 @@
 #include "lexic.h"
-#include "AST.h"
+//#include "AST.h"
 
+typedef struct AST {
+    int info;
+    AST * FunctionDecl;
+}AST;
 
 AST * parser(lexical * l);
 AST * Stmt();

@@ -4,6 +4,7 @@ Stack::Stack(){
     top = NULL;
     size_ = 0;
 }
+
 Stack::~Stack(){
     Node * p;
     while(!empty()){

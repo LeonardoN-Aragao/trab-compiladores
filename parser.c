@@ -16,6 +16,7 @@ int isType() {
     if(token == int_ || token == float_ || token == bool_ || token == char_ || 
         token == double_ || token == long_ || token == identifier)
         return 1;
+
     return 0;
 }
 
@@ -593,7 +594,7 @@ AST * TypeDecl(){
 }
 
 // FunctionalDecl -> Type Pointer id ( FormaList ) { StmtList }
-AST * FunctionalDecl() {
+struct AST * FunctionalDecl() {
     Type();
     Pointer();
     eat(identifier);
@@ -618,9 +619,13 @@ AST * Program(){
         case double_:
         case long_:
         case identifier:
-            FunctionalDecl();
-            Program();
-            break;
+
+            struct AST * algo;
+
+            algo.FunctionDecl = FunctionalDecl();
+            algo.FunctionDecl = Program();
+
+            return algo;
         
         case typedef_:
             TypeDecl();
