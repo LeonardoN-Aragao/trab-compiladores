@@ -430,10 +430,15 @@ Else* Parser_Else(){
 // StmtList -> Stmt StmtList
 // StmtList -> ''
 Stmtl* Parser_StmtList(){
-    if(isStmt()){
+  //printf("Entrou no Parser StmtList - line 433\n");
+    if(isStmt()) {
+        //printf("Entrou no if - line 435\n");
         return new Stmtl(Parser_Stmt(), Parser_StmtList());
     }
-    else return NULL;
+    else { 
+    //  printf("Else - line 439");
+      return NULL;
+    }
 }
 
 // FatId1 -> dot Expr
@@ -520,6 +525,7 @@ Stmt* Parser_Stmt(){
         }
         case while_:
         {
+            printf("Entrou case while - line 524\n");
             eat(while_);
             eat(lparent);
             Expr * e = Parser_Expr();

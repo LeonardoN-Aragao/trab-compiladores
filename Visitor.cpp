@@ -1,8 +1,8 @@
 #include "Visitor.h"
 
-Interpreter::Interpreter() {altura_tree=0;}
-void Interpreter::lvlm() {altura_tree++;}
-void Interpreter::lvln() {altura_tree--;}
+Interpreter::Interpreter() {this->height=0;}
+void Interpreter::lvl_next() {this->height++;}
+void Interpreter::lvl_prev() {this->height--;}
 
 
 // Exp
@@ -115,287 +115,452 @@ void Literal::accept(Visitor *v){ v->visit(this); };
 void Interpreter::visit(PlusExp *n) {
    // Desce na árvore
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "+");
+   // printf("%s", "+");
+   print("+");
    if(n->e2 != nullptr) n->e2->accept(this);
    // Sobe na árvore
 };
 void Interpreter::visit(MinusExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "-");
+   // printf("%s", "-");
+   print("-");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(TimesExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "*");
+   // printf("%s", "*");
+   print("*");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(DivideExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "/"); 
+   // printf("%s", "/"); 
+   print("/"); 
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(EqualsExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "==");
+   // printf("%s", "==");
+   print("==");
    if(n->e2 != nullptr) n->e2->accept(this); 
 };
 void Interpreter::visit(DifferentExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "!=");
+   // printf("%s", "!=");
+   print("!=");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(LowerExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "<");
+   // printf("%s", "<");
+   print("<");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(GraterExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", ">");
+   // printf("%s", ">");
+   print(">");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(LowerEqualExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "<=");
+   // printf("%s", "<=");
+   print("<=");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(GraterEqualExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", ">=");
+   // printf("%s", ">=");
+   print(">=");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(AndExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "&&");
+   // printf("%s", "&&");
+   print("&&");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(OrExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "||");
+   // printf("%s", "||");
+   print("||");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(RemainderExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "%");
+   // printf("%s", "%");
+   print("%");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(AndBitABitExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "&");
+   // printf("%s", "&");
+   print("&");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(OrBitABitExp *n) {
    if(n->e1 != nullptr) n->e1->accept(this);
-   printf("%s", "|");
+   // printf("%s", "|");
+   print("|");
    if(n->e2 != nullptr) n->e2->accept(this);
 };
 void Interpreter::visit(IntergerLiteral *n) {
-   printf("%s", n->f0);
+   // printf("%s", n->f0);
+   print(n->f0);
 };
 
 void Interpreter::visit(ExprListTailAux *n) {
-   printf("%s", ",");
+   this->lvl_next();
+   // printf("%s", ",");
+   print(",");
    if(n->elt != nullptr) n->elt->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(CaseBlock *n) {
-   printf("%s", "case");
-   printf("%s", "num :");
+   lvl_next();
+   // printf("%s", "case");
+   print("case");
+   // printf("%s", "num :");
+   print("num :");
    if(n->sl != nullptr) n->sl->accept(this);
    if(n->cb != nullptr) n->cb->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(DotFatId1 *n) {
-   printf("%s", "dot");
+   lvl_next();
+   // printf("%s", "dot");
+   print("dot");
    if(n->expr != nullptr) n->expr->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(ArrowFatId1 *n) {
-   printf("%s", "arrow");
+   lvl_next();
+   // printf("%s", "arrow");
+   print("arrow");
    if(n->expr != nullptr) n->expr->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(AmpersandFatId1 *n) {
-   printf("%s", "&");
+   lvl_next();
+   // printf("%s", "&");
+   print("&");
    if(n->expr != nullptr) n->expr->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(AssingmentFatId1 *n) {
-   printf("%s", "=");
+   lvl_next();
+   // printf("%s", "=");
+   print("=");
    if(n->expr != nullptr) n->expr->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(BracketFatId1 *n) {
-   printf("%s", "[");
+   lvl_next();
+   // printf("%s", "[");
+   print("[");
    if(n->expr != nullptr) n->expr->accept(this);
-   printf("%s", "]");
-   printf("%s", ";");
+   // printf("%s", "]");
+   print("]");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(CallFunction *n) {
-   printf("%s", "(");
+   lvl_next();
+   // printf("%s", "(");
+   print("(");
    if(n->el != nullptr) n->el->accept(this);
-   printf("%s", ")");
-   printf("%s", ";");
+   // printf("%s", ")");
+   print(")");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(FatIdIdList *n) {
+   lvl_next();
    if(n->il != nullptr) n->il->accept(this);
-   printf("%s", ";");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(FatIdFatId1 *n) {
+   lvl_next();
    if(n->fI != nullptr) n->fI->accept(this);
-   printf("%s", ";");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(Else *n) {
-   printf("%s", "else");
+   lvl_next();
+   // printf("%s", "else");
+   print("else");
    if(n->stmt != nullptr) n->stmt->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(While *n) {
-   printf("%s", "while");
-   printf("%s", "(");
+   lvl_next();
+   // printf("%s", "while");
+   print("while");
+   // printf("%s", "(");
+   print("(");
    if(n->expr != nullptr) n->expr->accept(this);
-   printf("%s", ")");
+   // printf("%s", ")");
+   print(")");
    if(n->stmt != nullptr) n->stmt->accept(this);
+   lvl_prev();
 }
 void Interpreter::visit(Switch *n) {
-   printf("%s", "switch");
-   printf("%s", "(");
+   lvl_next();
+   // printf("%s", "switch");
+   print("switch");
+   // printf("%s", "(");
+   print("(");
    if(n->expr != nullptr) n->expr->accept(this);
-   printf("%s", ")");
+   // printf("%s", ")");
+   print(")");
    if(n->cb != nullptr) n->cb->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(Break *n) {
-   printf("%s", "break");
-   printf("%s", ";");
+   lvl_next();
+   // printf("%s", "break");
+   print("break");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(Braces *n) {
-   printf("%s", "{");
+  print("BRACES");
+   lvl_next();
+   // printf("%s", "{");
+   print("{");
    if(n->stmtl != nullptr) n->stmtl->accept(this);
-   printf("%s", "}");
-   printf("%s", ";");
+   // printf("%s", "}");
+   print("}");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(Print *n) {
-   printf("%s", "print");
-   printf("%s", "(");
+  print("PRINT");
+   lvl_next();
+   // printf("%s", "print");
+   print("print");
+   // printf("%s", "(");
+   print("(");
    if(n->el != nullptr) n->el->accept(this);
-   printf("%s", ")");
-   printf("%s", ";");
+   // printf("%s", ")");
+   print(")");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(Readln *n) {
-   printf("%s", "readln");
-   printf("%s", "(");
+  print("READLN");
+   lvl_next();
+   // printf("%s", "readln");
+   print("readln");
+   // printf("%s", "(");
+   print("(");
    if(n->expr != nullptr) n->expr->accept(this);
-   printf("%s", ")");
+   // printf("%s", ")");
+   print(")");
+   lvl_prev();
 };
 void Interpreter::visit(Return *n) {
-   printf("%s", "return");
-   printf("%s", "(");
+  print("RETURN");
+   lvl_next();
+   // printf("%s", "return");
+   print("return");
+   // printf("%s", "(");
+   print("(");
    if(n->expr != nullptr) n->expr->accept(this);
-   printf("%s", ")");
-   printf("%s", ";");
+   // printf("%s", ")");
+   print(")");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(Throw *n) {
-   printf("%s", "throw");
-   printf("%s", ";");
+  print("THROW");
+   lvl_next();
+   // printf("%s", "throw");
+   print("throw");
+   // printf("%s", ";");
+   print(";");
+   lvl_prev();
 };
 void Interpreter::visit(Try *n) {
-   printf("%s", "try");
+  print("TRY");
+   lvl_next();
+   // printf("%s", "try");
+   print("try");
    if(n->tryStmt != nullptr) n->tryStmt->accept(this);
-   printf("%s", "catch");
-   printf("%s", "(");
+   // printf("%s", "catch");
+   print("catch");
+   // printf("%s", "(");
+   print("(");
    if(n->catchStmt != nullptr) n->catchStmt->accept(this);
-   printf("%s", ")");
+   // printf("%s", ")");
+   print(")");
    if(n->catchBlock != nullptr) n->catchBlock->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(If *n) {
-   printf("%s", "if");
-   printf("%s", "(");
+  print("IF");
+   lvl_next();
+   // printf("%s", "if");
+   print("if");
+   // printf("%s", "(");
+   print("(");
    if(n->expr != nullptr) n->expr->accept(this);
-   printf("%s", ")");
+   // printf("%s", ")");
+   print(")");
    if(n->stmt != nullptr) n->stmt->accept(this);
    if(n->el != nullptr) n->el->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(StmtFatId *n) {
+  print("STMTFATID");
+   lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->fI != nullptr) n->fI->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(Stmtl *n) {
+  print("STMTL");
+   lvl_next();
    if(n->stmt != nullptr) n->stmt->accept(this);
    if(n->stmtl != nullptr) n->stmtl->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(Array *n) {
-   printf("%s", "[");
-   printf("%s", "num");
-   printf("%s", "]");
+  print("ARRAY");
+   lvl_next();
+   // printf("%s", "[");
+   print("[");
+   // printf("%s", "num");
+   print("num");
+   // printf("%s", "]");
+   print("]");
    if(n->array != nullptr) n->array->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(IntType *n) {
-   printf("%s", "int");
+   // printf("%s", "int");
+   print("int");
 };
 void Interpreter::visit(FloatType *n) {
-   printf("%s", "float");
+   // printf("%s", "float");
+   print("float");
 };
 void Interpreter::visit(LongType *n) {
-   printf("%s", "long");
+   // printf("%s", "long");
+   print("long");
 };
 void Interpreter::visit(BoolType *n) {
-   printf("%s", "bool");
+   // printf("%s", "bool");
+   print("bool");
 };
 void Interpreter::visit(CharType *n) {
-   printf("%s", "char");
+   // printf("%s", "char");
+   print("char");
 };
 void Interpreter::visit(DoubleType *n) {
-   printf("%s", "double");
+   // printf("%s", "double");
+   print("double");
 };
 void Interpreter::visit(Pointer *n) {
-   printf("%s", "*");
+   // printf("%s", "*");
+   print("*");
 };
 void Interpreter::visit(FormalRest *n) {
-   printf("%s", ",");
+  print("FORMALREST");
+   lvl_next();
+   // printf("%s", ",");
+   print(",");
    if(n->fl != nullptr) n->fl->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(FormaList *n) {
+  print("FORMALIST");
+   lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->pointer != nullptr) n->pointer->accept(this);
-   printf("%s", "id");
+   // printf("%s", "id");
+   print("id");
    if(n->array != nullptr) n->array->accept(this);
    if(n->fr != nullptr) n->fr->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(VarDecl *n) {
+  print("VARDECL");
+  lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->idl != nullptr) n->idl->accept(this);
-   printf("%s", ";");
+   // printf("%s", ";");
+   print(";");
    if(n->vd != nullptr) n->vd->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(TypeDecl *n) {
-   printf("%s", "typedef");
-   printf("%s", "struct");
-   printf("%s", "{");
+   print("TYPEDECL"); 
+   lvl_next();
+   // printf("%s", "typedef");
+   print("typedef");
+   // printf("%s", "struct");
+   print("struct");
+   // printf("%s", "{");
+   print("{");
    if(n->type != nullptr) n->type->accept(this);
    n->idL->accept(this);
-   printf("%s", ";");
+   // printf("%s", ";");
+   print(";");
    n->vd->accept(this);
-   printf("%s", "}");
+   // printf("%s", "}");
+   print("}");
    n->id->accept(this);
-   printf("%s", ";");
+   // printf("%s", ";");
+   print(";");
    //n->typeDecl->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(FunctionOrVarDecl *n) {
+   print("FUNCTIONORVARDECL");
+   lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->pointer != nullptr) n->pointer->accept(this);
    if(n->id != nullptr) n->id->accept(this);
    if(n->programl != nullptr) n->programl->accept(this);
    if(n->program != nullptr) n->program->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(Program *n) {
+   print("PROGRAM");
+   lvl_next();
    if(n->fov != nullptr) n->fov->accept(this);
    // Dividir em dois casos?
    if(n->td != nullptr) n->td->accept(this);
    if(n->prog != nullptr) n->prog->accept(this);
+   lvl_prev();
 };
 void Interpreter::visit(ProgramL *n) {
+   print("PROGRAML");
+   lvl_next();
    if(n->array != nullptr) n->array->accept(this);
    if(n->idL != nullptr) n->idL->accept(this);
    // N teria q separar em 2 visit diferentes para cada caso
-   printf("%s", "(");
+   // printf("%s", "(");
+   print("(");
    if(n->fl != nullptr)n->fl->accept(this);
-   printf("%s", ")");
-   printf("%s", "{");
+   // printf("%s", ")");
+   print(")");
+   // printf("%s", "{");
+   print("{");
    if(n->sl != nullptr)  n->sl->accept(this);
-   printf("%s", "}");
+   // printf("%s", "}");
+   print("}");
+   lvl_prev();
 }
 
    void Interpreter::visit(F *n) {}
@@ -407,9 +572,18 @@ void Interpreter::visit(ProgramL *n) {
    void Interpreter::visit(Expr *n) {}
    void Interpreter::visit(Identifier *n) {
       // if(n->token_name != nullptr)  n->accept(this);
-      printf("%s", n->token_name);
+      // printf("%s", n->token_name);
+      print(n->token_name);
    }
    void Interpreter::visit(Num *n) {}
    void Interpreter::visit(Type *n) {}
    void Interpreter::visit(IdList*n) {}
    void Interpreter::visit(FatId *n) {}
+
+   void Interpreter::print(char *s) {
+      for(int i=0; i<this->height; i++) {
+         printf(" ");
+      }
+      printf("%s\n", s);
+   }
+   // }

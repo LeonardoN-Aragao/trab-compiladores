@@ -77,9 +77,10 @@ public:
 // Accepts definitions -------------------------------------------------------
 class Interpreter: public Visitor {
 private:
-	int altura_tree;
-	void lvlm();
-	void lvln();
+	int height;
+	void lvl_next();
+	void lvl_prev();
+   void print(char *s);
 public:
 	Interpreter();
    void visit(PlusExp *n) override;
