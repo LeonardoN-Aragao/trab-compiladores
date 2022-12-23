@@ -191,7 +191,8 @@ int nextToken(lexical *obj)
 
    if (isspace(c) != 0)
    {
-      return -100;
+      //return -100;
+      return nextToken(obj);
    }
 
    do

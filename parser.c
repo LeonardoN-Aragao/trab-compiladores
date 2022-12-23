@@ -13,8 +13,12 @@ int token = 0;
 // ----------------------------------------
 
 // Errors ------------------------------------------------
-void error() {
-  printf("Error!!!\n");
+void error(char * s) {
+  printf("Error: %s!!!\n",s);
+}
+
+void errorEat(int a,int b) {
+    printf("Error: %d != %d!!!\n",a,b);
 }
 
 int inFollow(int token, int *follow) {
@@ -51,7 +55,7 @@ void erro(int token) {
 // -------------------------------------------------------
 
 void advance() { token = nextToken(lex); }
-void eat(int t) {if (token == t) advance(); else error();}
+void eat(int t) {if (token == t) advance(); else errorEat(token,t);}
 
 int isType() {
     if(token == int_ || token == float_ || token == bool_ || token == char_ || 
@@ -131,7 +135,7 @@ F * Parser_F (){
             return f;
         }
         default:
-            error();
+            error("F");
             return NULL;
     }
 }
@@ -155,7 +159,7 @@ Num * Parser_Num(){
             return  f;
         }
         default:
-            error();
+            error("Num");
             return NULL;
     }
 }
@@ -210,7 +214,7 @@ Type* Parser_Type(){
             return Parser_identifier();
 
         default:
-            error();
+            error("Type");
             return NULL;
     }
 }
@@ -456,7 +460,7 @@ FatId1* Parser_FatId1(){
             return b;
         }
         default:
-            error();
+            error("FatId1");
             return NULL;
         }
 }
@@ -596,7 +600,7 @@ Stmt* Parser_Stmt(){
             return new StmtFatId(t,f);
         }
         else{
-            error();
+            error("Stmt");
             return NULL;
         }
     }
@@ -617,7 +621,6 @@ Pointer* Parser_Pointer() {
 // VarDecl -> ''
 VarDecl* Parser_VarDecl(){
     if(!isType() || token !=identifier){
-        error();
         return NULL;
     }
         
@@ -789,7 +792,6 @@ Program * Parser_Program(){
             return new Program(Parser_TypeDecl(),Parser_Program());
     
     default:
-        error();
         return NULL;
     }
 }
@@ -797,6 +799,7 @@ Program * Parser_Program(){
 Program * S() {
     Program * p = Parser_Program();
     eat(EOF);
+    printf("Saiu");
     return p;
 }
 
