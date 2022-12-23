@@ -3,12 +3,14 @@
 #include "parser.h"
 #include "lexic.h"
 #include "AST.h"
+#include "Visitor.h"
 //#include "errorManager.h"
 
 // ------------ REMOVER ??? ---------------
 
 lexical * lex;
 int token = 0;
+Interpreter *x;
 
 // ----------------------------------------
 
@@ -799,9 +801,10 @@ Program * Parser_Program(){
 Program * S() {
     Program * p = Parser_Program();
     eat(EOF);
-    Interpreter *x = new Interpreter();
+    x = new Interpreter();
     x->visit(p);
-    printf("Saiu");
+    printf("\n");
+    printf("Saiu\n");
     return p;
 }
 
