@@ -119,6 +119,11 @@ int main(int argc, char **argv)
    lexical *lex = lexical_construct(reservedWordsOflanguage, fileName, readFromFile);
 
    Program * a = parser(lex);
+   //  int x, y;
+   // FunctionOrVarDecl *c = (new IntType(), NULL, new Identifier("xx"), new ProgramL(NULL, NULL),NULL));
+   // Program * b = new Program(c);
+   // Visitor *v;
+   // v->visit(a);
 
    // int token = 0;
    // while (token != EOF)

@@ -799,6 +799,8 @@ Program * Parser_Program(){
 Program * S() {
     Program * p = Parser_Program();
     eat(EOF);
+    Interpreter *x = new Interpreter();
+    x->visit(p);
     printf("Saiu");
     return p;
 }

@@ -575,6 +575,7 @@ public:
 // Accepts definitions -------------------------------------------------------
 class Interpreter: public Visitor {
 public:
+	Interpreter() {};
 	void visit(PlusExp *n) {
 		// Desce na árvore
 		n->e1->accept(this);

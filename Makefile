@@ -1,5 +1,5 @@
 compile: 
-	g++ *.c* *.h -o program
+	g++ -w *.c* *.h -o program
 	
 run:
 	./program $(file)
