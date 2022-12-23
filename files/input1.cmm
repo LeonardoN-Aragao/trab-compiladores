@@ -1,11 +1,1 @@
-int getTotalTickets(Process *plist){
-    int total = 0; float 4.8999, 998E9;
-    for (Process *p = plist; p != NULL; p = processGetNext(p))
-  {
-    LotterySchedParams *schedparams = processGetSchedParams(p);
-
-    if (processGetStatus(p) != PROCWAITING)
-      total += schedparams->numtickets;
-  }
-  return total;
-}
+int getTotalTickets(Process *plist){}
