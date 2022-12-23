@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "parser.h"
 #include "lexic.h"
 #include "AST.h"
@@ -76,20 +77,86 @@ Identifier * Parser_identifier(){
     return  i;
 }
 
+// F ::= ( Expr )
+// F ::= id
+// F ::= num
+// F ::= literal
+// F ::= true
+// F ::= false
+
+F * Parser_F (){
+    switch(token){
+        case numInt: 
+        {
+            char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+            Int * i = new Int(atoi(token_value));
+            eat(numInt);
+            return  i;
+        }
+        case numFloat:
+        {
+            char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+            Float * f = new Float(atof(token_value));
+            eat(numFloat);
+            return  f;
+        }
+        case literal:
+        {
+            char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+            Literal * l = new Literal(token_value);
+            eat(literal);
+            return  l;
+        }
+        case true_:
+            eat(true_);
+            return new True(); 
+
+        case false_:
+            eat(false_);
+            return new False(); 
+
+        case identifier:
+        {
+            char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+            Identifier_F * i = new Identifier_F(token_value);
+            eat(identifier);
+            return  i;
+        }
+
+        case lparent:
+        {
+            eat(lparent);
+            F_Expr * f = new F_Expr(Parser_Expr());
+            eat(rparent);
+            return f;
+        }
+        default:
+            error();
+            return NULL;
+    }
+}
+
 //Num -> numInt
 //Num -> numFloat
 Num * Parser_Num(){
     switch (token){
-        case numInt:
+        case numInt: 
+        {
+            char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+            Int * i = new Int(atoi(token_value));
             eat(numInt);
-            break;
+            return  i;
+        }
         case numFloat:
+        {
+            char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+            Float * f = new Float(atof(token_value));
             eat(numFloat);
-            break;
-        
+            return  f;
+        }
         default:
             error();
-            break;
+            return NULL;
     }
 }
 
@@ -101,16 +168,51 @@ Num * Parser_Num(){
 // Type -> char
 // Type -> double
 Type* Parser_Type(){
-    if(token == int_ || token == float_ || token == bool_ || token == char_ || token == double_ || token == long_)
-        advance();
-    else if(1) //verificar tabela de simbolos
-        return;
-    else
-        error();
-}
+    
+    switch (token) {
+        case int_: 
+        {
+            IntType * i = new IntType();
+            eat(int_);
+            return  i;
+        }
+        case float_:
+        {
+            FloatType * f = new FloatType();
+            eat(float_);
+            return  f;
+        }
+        case bool_:
+        {
+            BoolType * b = new BoolType();
+            eat(bool_);
+            return  b;
+        }
+        case char_:
+        {
+            CharType * c = new CharType();
+            eat(char_);
+            return  c;
+        }
+        case double_:
+        {
+            DoubleType * d = new DoubleType();
+            eat(double_);
+            return  d;
+        }
+        case long_:
+        {
+            LongType * l = new LongType();
+            eat(long_);
+            return  l;
+        }
+        case identifier:
+            return Parser_identifier();
 
-Expr* Parser_F(){
-
+        default:
+            error();
+            return NULL;
+    }
 }
 
 // Expr9Aux -> plusUnary Expr9
@@ -522,8 +624,11 @@ Stmt* Parser_Stmt(){
 // Pointer -> asterisk
 // Pointer -> ''
 Pointer* Parser_Pointer() {
-    if(token == asterisk) advance();
-    else return;
+    if(token == asterisk){
+        eat(asterisk);
+        return new Pointer();
+    }
+    else return NULL;
 }
 
 // VarDecl -> Type IdList ; VarDecl
@@ -584,11 +689,11 @@ FormaList* Parse_FormaList() {
 Array * Parser_Array() {
     if(token == lbrackets){
         eat(lbrackets);
-        eat(numInt);
+        Int * i = (Int*) Parser_Num();
         eat(rbrackets);
-        Parser_Array();
+        return new Array(i,Parser_Array());
     }
-    else return;
+    else return NULL;
 }
 
 // CaseBlock -> case numInt : StmtList CaseBlock
@@ -596,10 +701,11 @@ Array * Parser_Array() {
 CaseBlock * Parser_CaseBlock() {
     if(token == case_){
         eat(case_);
+        char * token_value = searchAndGetString(lex, token, getLexeme(lex));
+        Int * i = new Int(atoi(token_value));
         eat(numInt);
         eat(colon);
-        Parser_StmtList();
-        Parser_CaseBlock();
+        return new CaseBlock(i,Parser_StmtList(), Parser_CaseBlock());
     }
     else return NULL;
 }

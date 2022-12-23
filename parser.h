@@ -15,5 +15,6 @@ Array * Parser_Array();
 IdList * Parser_IdList();
 IdListAux * Parser_IdListAux();
 CaseBlock * Parser_CaseBlock();
+Expr * Parser_Expr();
 Expr * Expr9();
 ProgramL * Parser_ProgramL();

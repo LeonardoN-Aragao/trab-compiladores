@@ -31,11 +31,6 @@ class ProgramL {
 		Array * array; IdList * idL; FormaList* fl; Stmtl* sl;
 };
 
-class Array { 
-	public:
-		Array(Array * a, unsigned int s) { array = a; size =s; }
-		unsigned int size; Array * array;
-};
 
 class IdList { 
 	public:
@@ -43,62 +38,101 @@ class IdList {
 		Identifier ** list; unsigned int size;
 };
 
+class Expr { public: Expr(){}; };
+
+class F : public Expr { public: F(){}; };
+
+class F_Expr : public F {
+	public: 
+		F_Expr(Expr * ex) { expr = ex; }
+		Expr * expr; 
+};
+
+class Num : public F { public: Num(){}; };
+
+class True : public F { public: True(){}; };
+
+class False : public F { public: False(){}; };
+
+class Literal : public F { 
+	public:
+		Literal(char* v) { value = v; }
+		char* value;
+};
+
+class Int : public Num { 
+	public:
+		Int(int v) { value = v; }
+		int value;
+};
+
+class Array { 
+	public:
+		Array(Int * i, Array * a) { array = a; n = i; }
+		Array * array; Int * n;
+};
+
+class Float : public Num { 
+	public:
+		Float(float v) { value = v; }
+		float value;
+};
+
+class Char : public F {
+	public:
+		Char(char v) { value = v; }
+		char value;
+};
+
+class Bool : public F { 
+	public:
+		Bool(float v) { value = v; }
+		float value;
+};
+
+class Long : public F { 
+	public:
+		Long(long v) { value = v; }
+		long value;
+};
+
+class Double : public F { 
+	public:
+		Double(double v) { value = v; }
+		double value;
+};
+
+class Identifier_F :public F { 
+	public: 
+		Identifier_F(char * nome) { token_name = nome; } 
+		char * token_name; 
+};
+
 class Type { public: Type(){};};
 
+class LongType : public Type { public: LongType(){};};
 
-class Num : Type { public: Num(){};};
+class IntType : public Type { public: IntType(){}; };
 
-class LongType : Type { 
+class FloatType : public Type { public: FloatType(){}; };
+
+class BoolType : public Type { public: BoolType(){}; };
+
+class CharType : public Type { public: CharType(){}; };
+
+class DoubleType : public Type { public: DoubleType(){}; };
+
+class Identifier :public Type { 
 	public: 
-		LongType(long v){ value = v; } 
-		long value; 
-};
-
-class IntType : Num { 
-	public:
-		IntType(int v){ value = v; } 
-		int value; 
-};
-
-class FloatType : Num { 
-	public:
-		FloatType(float v){ value = v; }
-		float value; 
-};
-
-class BoolType : Type { 
-	public:
-		BoolType(bool v){ value = v; }
-		bool value; 
-};
-
-class CharType : Type { 
-	public:
-		CharType(char v){ value = v; }
-		char value; 
-};
-
-class DoubleType : Type { 
-	public:
-		DoubleType(double v){ value = v; }
-		double value; 
-};
-
-class Identifier { 
-	public:
 		Identifier(char * nome) { token_name = nome; } 
 		char * token_name; 
 };
 
-class VarDecl { 
-	public:
-		VarDecl(Type * t, Identifier * i) { type = t; id = i; }
+class VarDecl { public: VarDecl(Type * t, Identifier * i) { type = t; id = i; }
 		Type * type; Identifier * id;
 };
 
-class Expr {};
-
-class Stmt {};
+class Stmt { public: Stmt(){};};
 
 class Break : Stmt {  };
 
@@ -124,8 +158,8 @@ class While : Stmt {
 
 class CaseBlock { 
 	public: 
-		CaseBlock(IntType ** i, unsigned int s) { cl = i; size = s; }
-		IntType ** cl; unsigned int size; 
+		CaseBlock(Int * i, Stmtl * s, CaseBlock * c) { cl = i; sl = s; cb = c; }
+		Int * cl; Stmtl * sl; CaseBlock * cb; 
 };
 
 class Switch : Stmt { 
@@ -261,11 +295,6 @@ class ExprList : Expr {
 		ExprListTail * elt; 
 };
 
-class F : Expr {
-	public: 
-		F(Expr * ex) { expr = ex; }
-		Expr * expr; 
-};
 
 class TypeDecl { 
 	public:
