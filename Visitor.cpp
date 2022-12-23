@@ -563,22 +563,44 @@ void Interpreter::visit(ProgramL *n) {
    lvl_prev();
 }
 
-   void Interpreter::visit(F *n) {}
-   void Interpreter::visit(ExprList *n) {}
-   void Interpreter::visit(ExprListTail *n) {}
-   void Interpreter::visit(IdListAux *n) {}
+   void Interpreter::visit(F *n) {
+      n->ex1->accept(this);
+   }
+   void Interpreter::visit(ExprList *n) {
+      n->elt->accept(this);
+   }
+   void Interpreter::visit(ExprListTail *n) {
+      n->expr->accept(this);
+      n->elt->accept(this);
+   }
+   void Interpreter::visit(IdListAux *n) {
+      print(",");
+      n->il->accept(this);
+   }
    void Interpreter::visit(FatId1 *n) {}
    void Interpreter::visit(Stmt *n) {}
-   void Interpreter::visit(Expr *n) {}
+   void Interpreter::visit(Expr *n) {
+      print("EXPR");
+   }
    void Interpreter::visit(Identifier *n) {
       // if(n->token_name != nullptr)  n->accept(this);
       // printf("%s", n->token_name);
       print(n->token_name);
    }
-   void Interpreter::visit(Num *n) {}
+   void Interpreter::visit(Num *n) {
+      print("num");
+   }
    void Interpreter::visit(Type *n) {}
    void Interpreter::visit(IdList*n) {}
    void Interpreter::visit(FatId *n) {}
+
+   void Interpreter::visit(Int *n) {
+      print((char*)n->value);
+      printf("%d", n->value);
+   };
+	void Interpreter::visit(Float *n) {
+      // print((char*)n->value);
+   };
 
    void Interpreter::print(char *s) {
       for(int i=0; i<this->height; i++) {

@@ -57,7 +57,7 @@ void erro(int token) {
 // -------------------------------------------------------
 
 void advance() { token = nextToken(lex); }
-void eat(int t) {if (token == t) advance(); else errorEat(token,t);}
+void eat(int t) { if (token == t) advance(); else errorEat(token,t);}
 
 int isType() {
     if(token == int_ || token == float_ || token == bool_ || token == char_ || 
@@ -246,7 +246,9 @@ Expr* Expr9Aux() {
 
 // Expr9 -> F Expr9Aux
 Expr* Expr9() {
-    return new Expr(Parser_F(), Expr9Aux());
+    F *f = Parser_F();
+    Expr *e = Expr9Aux();
+    return new Expr(f, e);
 }
 
 // Expr8Aux -> * Expr9 Expr8Aux
@@ -335,7 +337,9 @@ Expr* Expr6Aux() {
 
 // Expr6 -> Expr7 Expr6Aux
 Expr* Expr6() {
-    return new Expr(Expr7(), Expr6Aux());
+    Expr *e1 = Expr7();
+    Expr *e2 = Expr6Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr5Aux -> == Expr6 Expr5Aux
@@ -344,9 +348,13 @@ Expr* Expr6() {
 Expr* Expr5Aux() {
     switch(token){
         case equality:
+        {
             eat(equality);
-            return new Expr(Expr6(), Expr5Aux());
-
+            Expr *e1 = Expr6();
+            Expr *e2 = Expr5Aux();
+            return new Expr(e1, e2);
+            // return new Expr(Expr6(), Expr5Aux());
+        }
         case notEqual:
             eat(notEqual);
             return new Expr(Expr6(), Expr5Aux());
@@ -358,7 +366,9 @@ Expr* Expr5Aux() {
 
 // Expr5 -> Expr6 Expr5Aux
 Expr* Expr5() {
-    return new Expr(Expr6(), Expr5Aux());
+    Expr *e1 = Expr6();
+    Expr *e2 = Expr5Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr4Aux -> & Expr5 Expr4Aux
@@ -414,7 +424,9 @@ Expr* ExprAux(){
 
 //Expr -> Expr2 ExprAux
 Expr* Parser_Expr(){
-    return new Expr(Expr2(), ExprAux());
+    Expr *e1 = Expr2();
+    Expr *ea1 = ExprAux();
+    return new Expr(e1, ea1);
 }
 
 // Else-> else Stmt
@@ -430,13 +442,12 @@ Else* Parser_Else(){
 // StmtList -> Stmt StmtList
 // StmtList -> ''
 Stmtl* Parser_StmtList(){
-  //printf("Entrou no Parser StmtList - line 433\n");
     if(isStmt()) {
-        //printf("Entrou no if - line 435\n");
-        return new Stmtl(Parser_Stmt(), Parser_StmtList());
+        Stmt *s = Parser_Stmt();
+        Stmtl *sl = Parser_StmtList();
+        return new Stmtl(s, sl);
     }
-    else { 
-    //  printf("Else - line 439");
+    else {
       return NULL;
     }
 }
@@ -525,14 +536,13 @@ Stmt* Parser_Stmt(){
         }
         case while_:
         {
-            printf("Entrou case while - line 524\n");
             eat(while_);
             eat(lparent);
             Expr * e = Parser_Expr();
             eat(rparent);
-            eat(lbraces);
+            // eat(lbraces);
             Stmt * s = Parser_Stmt();
-            eat(rbraces);
+            // eat(rbraces);
             return new While(e,s);
         }
         case switch_:
