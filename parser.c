@@ -643,6 +643,17 @@ IdList* Parser_IdList() {
     Identifier * id = Parser_identifier();
     return new IdList(p,id,Parser_Array(),Parser_IdListAux());
 }
+// FormaList -> Type Pointer id Array FormalRest
+// FormaList -> ''
+FormaList* Parser_FormaList() {
+    if(isType()){
+        Type * t = Parser_Type();
+        Pointer * p = Parser_Pointer();
+        eat(identifier);
+        return new FormaList(t,p,Parser_Array(),Parser_FormalRest());
+    }
+    else return NULL;
+}  
 
 // FormalRest -> , FormaList
 // FormalRest -> ''
@@ -654,17 +665,7 @@ FormalRest* Parser_FormalRest() {
     else return NULL;
 }
 
-// FormaList -> Type Pointer id Array FormalRest
-// FormaList -> ''
-FormaList* Parse_FormaList() {
-    if(isType()){
-        Type * t = Parser_Type();
-        Pointer * p = Parser_Pointer();
-        eat(identifier);
-        return new FormaList(t,p,Parser_Array(),Parser_FormalRest());
-    }
-    else return NULL;
-}    
+  
 
 // Array -> [ NumInt ] Array
 // Array -> ''
@@ -745,7 +746,7 @@ ProgramL * Parser_ProgramL(){
         FormaList * f = Parser_FormaList();
         eat(rparent);
         eat(lbraces);
-        Stmtl * s = Parser_Stmtl();
+        Stmtl * s = Parser_StmtList();
         eat(rbraces);
 
         return new ProgramL(f,s);
