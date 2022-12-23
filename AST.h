@@ -17,6 +17,7 @@ class Identifier;
 class Expr;
 class IdList;
 class Stmtl;
+class IdListAux;
 
 class Pointer { 
 	public: 
@@ -26,19 +27,24 @@ class Pointer {
 
 class ProgramL { 
 	public: 
-		ProgramL(Array * a, IdList * id) { array = a; idL = id; }
+		ProgramL(Array * a, IdListAux * id) { array = a; idL = id; }
 		ProgramL(FormaList* f, Stmtl* s) { fl = f; sl = s; }
-		Array * array; IdList * idL; FormaList* fl; Stmtl* sl;
+		Array * array; IdListAux * idL; FormaList* fl; Stmtl* sl;
 };
 
-
+// IdList ::= Pointer id Array IdList'
 class IdList { 
 	public:
-		IdList(Identifier ** l, unsigned int s) { list = l; size =s; }
-		Identifier ** list; unsigned int size;
+		IdList(Pointer* p, Identifier * i, Array * a, IdListAux * il) { pointer = p; id = i; array = a; idl = il; }
+		Pointer* pointer; Identifier * id; Array * array; IdListAux * idl;
 };
 
-class Expr { public: Expr(){}; };
+class Expr { 
+	public: 
+		Expr(){};
+		Expr(Expr* e1, Expr * e2) { ex1 = e1; ex2 = e2; }
+		Expr* ex1; Expr * ex2;
+};
 
 class F : public Expr { public: F(){}; };
 
@@ -128,29 +134,31 @@ class Identifier :public Type {
 		char * token_name; 
 };
 
-class VarDecl { public: VarDecl(Type * t, Identifier * i) { type = t; id = i; }
-		Type * type; Identifier * id;
+class VarDecl { 
+	public: 
+		VarDecl(Type * t, IdList * i, VarDecl * v) { type = t; idl = i; vd = v; }
+		Type * type; IdList * idl; VarDecl * vd;
 };
 
 class Stmt { public: Stmt(){};};
 
-class Break : Stmt {  };
+class Break : public Stmt {  };
 
-class Throw : Stmt {  };
+class Throw : public Stmt {  };
 
-class Else : Stmt { 
+class Else : public Stmt { 
 	public: 
 		Else(Stmt * s) { stmt = s; }
 		Stmt * stmt;
 };
 
-class If : Stmt { 
+class If : public Stmt { 
 	public: 
 		If(Expr * ex, Stmt * s, Else * e) { expr = ex; stmt = s; el = e; }
 		Expr * expr; Stmt * stmt; Else * el;
 };
 
-class While : Stmt { 
+class While : public Stmt { 
 	public: 
 		While (Expr * ex, Stmt * s) { stmt = s; expr = ex; }
 		Expr * expr; Stmt * stmt;
@@ -162,43 +170,43 @@ class CaseBlock {
 		Int * cl; Stmtl * sl; CaseBlock * cb; 
 };
 
-class Switch : Stmt { 
+class Switch : public Stmt { 
 	public: 
 		Switch(Expr * ex, CaseBlock * c) { expr = ex; cb = c; }
 		Expr * expr; CaseBlock * cb;
 };
 
-class Return : Stmt { 
+class Return : public Stmt { 
 	public: 
 		Return(Expr * ex) { expr = ex; }
 		Expr * expr;
 };
 
-class Try : Stmt { 
+class Try : public Stmt { 
 	public: 
 		Try(Stmt * tS, Stmt * cS, Stmt * cB) { tryStmt = tS; catchStmt = cS; catchBlock = cB; }
 		Stmt * tryStmt; Stmt * catchStmt; Stmt * catchBlock;
 };
 
-class Print : Stmt {
+class Print : public Stmt {
 	public: 
 		Print(ExprList * e) { el = e; } 
 		ExprList * el; 
 };
 
-class Readln : Stmt { 
+class Readln : public Stmt { 
 	public:
 		Readln(Expr * ex) { expr = ex; } 
 		Expr *expr;
 };
 
-class StmtFatId : Stmt { 
+class StmtFatId : public Stmt { 
 	public: 
 		StmtFatId(Type * t, FatId * f) { type = t; fI = f;}
 		Type * type; FatId * fI; 
 };
 
-class Stmtl : Stmt { 
+class Stmtl : public Stmt { 
 	public:
 		Stmtl(Stmt * s, Stmtl * sl) { stmt = s; stmtl = sl; } 
 		Stmt * stmt; Stmtl * stmtl; 
@@ -208,49 +216,49 @@ class FatId {};
 
 class FatId1 {};
 
-class CallFunction: FatId { 
+class CallFunction: public FatId { 
 	public: 
 		CallFunction(ExprList * e) { el = e; }
 		ExprList * el; 
 };
 
-class FatIdIdList : FatId { 
+class FatIdIdList : public FatId { 
 	public: 
 		FatIdIdList(IdList * i){ il = i;}
 		IdList * il; 
 };
 
-class FatIdFatId1 : FatId { 
+class FatIdFatId1 : public FatId { 
 	public:
 		FatIdFatId1(FatId1 * f){ fI = f; }
 		FatId1 * fI; 
 };
 
-class DotFatId1 : FatId1 { 
+class DotFatId1 : public FatId1 { 
 	public: 
 		DotFatId1(Expr * ex) { expr = ex; }
 		Expr * expr; 
 };
 
-class ArrowFatId1 : FatId1 { 
+class ArrowFatId1 : public FatId1 { 
 	public: 
 		ArrowFatId1(Expr * ex) { expr = ex; } 
 		Expr * expr; 
 };
 
-class AmpersandFatId1 : FatId1 { 
+class AmpersandFatId1 : public FatId1 { 
 	public:
 	 	AmpersandFatId1(Expr * ex){ expr = ex; }
 		Expr * expr; 
 };
 
-class AssingmentFatId1 : FatId1 { 
+class AssingmentFatId1 : public FatId1 { 
 	public: 
 		AssingmentFatId1(Expr * ex){ expr = ex; }
 		Expr * expr; 
 };
 
-class BracketFatId1 : FatId1 { 
+class BracketFatId1 : public FatId1 { 
 	public: 
 		BracketFatId1(Expr * ex){ expr = ex; }
 		Expr * expr; 

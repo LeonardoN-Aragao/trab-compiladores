@@ -223,27 +223,24 @@ Expr* Expr9Aux() {
     switch(token){
         case plusSign:
             eat(plusSign);
-            Expr9();
-            break;
+            return Expr9();
 
         case minusSign:
             eat(minusSign);
-            Expr9();
-            break;
+            return Expr9();
 
         case exclamation:
             eat(exclamation);
-            Expr9();
-            break;
+            return Expr9();
 
         default:    
-            return;
+            return NULL;
     }
 }
 
 // Expr9 -> F Expr9Aux
 Expr* Expr9() {
-    Parser_F(); Expr9Aux();
+    return new Expr(Parser_F(), Expr9Aux());
 }
 
 // Expr8Aux -> * Expr9 Expr8Aux
@@ -254,30 +251,27 @@ Expr* Expr8Aux() {
      switch(token){
         case asterisk:
             eat(asterisk);
-            Expr9();
-            Expr8Aux();
+            return new Expr(Expr9(), Expr8Aux());
             break;
 
         case slash:
             eat(slash);
-            Expr9();
-            Expr8Aux();
+            return new Expr(Expr9(), Expr8Aux());
             break;
 
         case percent:
             eat(percent);
-            Expr9();
-            Expr8Aux();
+            return new Expr(Expr9(), Expr8Aux());
             break;
 
         default:    
-            return;
+            return NULL;
     }
 }
 
 // Expr8 -> Expr9 Expr8Aux
 Expr* Expr8() {
-    Expr9(); Expr8Aux();
+    return new Expr(Expr9(), Expr8Aux());
 }
 
 // Expr7Aux -> + Expr8 Expr7Aux
@@ -287,24 +281,22 @@ Expr* Expr7Aux() {
     switch(token){
         case plusSign:
             eat(plusSign);
-            Expr8();
-            Expr7Aux();
+            return new Expr(Expr8(), Expr7Aux());
             break;
 
         case minusSign:
             eat(minusSign);
-            Expr8();
-            Expr7Aux();
+            return new Expr(Expr8(), Expr7Aux());
             break;
 
         default:    
-            return;
+            return NULL;
     }
 }
 
 // Expr7 -> Expr8 Expr7Aux
 Expr* Expr7() {
-    Expr8(); Expr7Aux();
+    return new Expr(Expr8(), Expr7Aux());
 }
 
 // Expr6Aux -> < Expr7 Expr6Aux
@@ -316,36 +308,28 @@ Expr* Expr6Aux() {
     switch(token){
         case lessSign:
             eat(lessSign);
-            Expr7();
-            Expr6Aux();
-            break;
+            return new Expr(Expr7(), Expr6Aux());
 
         case great:
             eat(great);
-            Expr7();
-            Expr6Aux();
-            break;
+            return new Expr(Expr7(), Expr6Aux());
         
         case lessOrEqual:
             eat(lessOrEqual);
-            Expr7();
-            Expr6Aux();
-            break;
+            return new Expr(Expr7(), Expr6Aux());
 
         case greaterOrEqual:
             eat(greaterOrEqual);
-            Expr7();
-            Expr6Aux();
-            break;
+            return new Expr(Expr7(), Expr6Aux());
 
         default:    
-            return;
+            return NULL;
     }
 }
 
 // Expr6 -> Expr7 Expr6Aux
 Expr* Expr6() {
-    Expr7(); Expr6Aux();
+    return new Expr(Expr7(), Expr6Aux());
 }
 
 // Expr5Aux -> == Expr6 Expr5Aux
@@ -355,84 +339,76 @@ Expr* Expr5Aux() {
     switch(token){
         case equality:
             eat(equality);
-            Expr6();
-            Expr5Aux();
-            break;
+            return new Expr(Expr6(), Expr5Aux());
 
         case notEqual:
             eat(notEqual);
-            Expr6();
-            Expr5Aux();
-            break;
+            return new Expr(Expr6(), Expr5Aux());
 
         default:    
-            return;
+            return NULL;
     }
 }
 
 // Expr5 -> Expr6 Expr5Aux
 Expr* Expr5() {
-    Expr6(); Expr5Aux();
+    return new Expr(Expr6(), Expr5Aux());
 }
 
 // Expr4Aux -> & Expr5 Expr4Aux
 // Expr4Aux -> ''
 Expr* Expr4Aux() {
     if(token == ampersand){
-        Expr5(); 
-        Expr4Aux();
+        return new Expr(Expr5(), Expr4Aux());
     }
-    else return;
+    else return NULL;
 }
 
 // Expr4 -> Expr5 Expr4Aux
 Expr* Expr4() {
-    Expr5(); Expr4Aux();
+    return new Expr(Expr5(), Expr4Aux());
 }
 
 // Expr3Aux -> | Expr4 Expr3Aux
 // Expr3Aux -> ''
 Expr* Expr3Aux() {
     if(token == verticalPipe){
-        Expr4(); 
-        Expr3Aux();
+        return new Expr(Expr4(), Expr3Aux());
     }
-    else return;
+    else return NULL;
 }
 
 // Expr3 -> Expr4 Expr3Aux
 Expr* Expr3() {
-    Expr4(); Expr3Aux();
+    return new Expr(Expr4(), Expr3Aux());
 }
 
 // Expr2Aux -> && Expr3 Expr2Aux
 // Expr2Aux -> ''
 Expr* Expr2Aux() {
     if(token == andSign){
-        Expr3(); 
-        Expr2Aux();
+        return new Expr(Expr3(), Expr2Aux());
     }
-    else return;
+    else return NULL;
 }
 
 // Expr2 -> Expr3 Expr2Aux
 Expr* Expr2() {
-    Expr3(); Expr2Aux();
+    return new Expr(Expr3(), Expr2Aux());
 }
 
 // ExprAux -> || Expr2 ExprAux
 // ExprAux -> ''
 Expr* ExprAux(){
     if(token == orSign){
-        Expr2(); 
-        ExprAux();
+        return new Expr(Expr2(), ExprAux());
     }
-    else return;
+    else return NULL;
 }
 
 //Expr -> Expr2 ExprAux
 Expr* Parser_Expr(){
-    Expr2(); ExprAux();
+    return new Expr(Expr2(), ExprAux());
 }
 
 // Else-> else Stmt
@@ -440,20 +416,18 @@ Expr* Parser_Expr(){
 Else* Parser_Else(){
     if(token == else_){
         eat(else_);
-        Parser_Stmt();
-        //arv.add(tabela[Else])
+        return new Else(Parser_Stmt());
     }
-    else return;
+    else return NULL;
 }
 
 // StmtList -> Stmt StmtList
 // StmtList -> ''
 Stmtl* Parser_StmtList(){
     if(isStmt()){
-        Parser_Stmt(); 
-        Parser_StmtList();
+        return new Stmtl(Parser_Stmt(), Parser_StmtList());
     }
-    else return;
+    else return NULL;
 }
 
 // FatId1 -> dot Expr
@@ -464,58 +438,56 @@ FatId1* Parser_FatId1(){
     switch (token){
         case dot:
             eat(dot);
-            Parser_Expr();
-            break;
+            return new DotFatId1(Parser_Expr());
 
         case arrow:
             eat(arrow);
-            Parser_Expr();
-            break;
+            return new ArrowFatId1(Parser_Expr());
 
         case assignment:
             eat(assignment);
-            Parser_Expr();
-            break;
+            return new AssingmentFatId1(Parser_Expr());
 
         case lbrackets:
+        {
             eat(lbrackets);
-            Parser_Expr();
+            BracketFatId1 * b =  new BracketFatId1(Parser_Expr());
             eat(rbrackets);
-            break;
-
-    default:
-        error();
-    }
+            return b;
+        }
+        default:
+            error();
+            return NULL;
+        }
 }
 
-// FatId -> ( ExprList  )
-// FatId ->  IdList ; STMT
-// FatId -> FatId1
-// FatId -> ''
+// FatId ::= ( ExprList ) ;
+// FatId ::=  IdList ;
+// FatId ::= FatId1 ;
 FatId * Parser_FatId(){
     switch(token){
         case lparent:
+        {
             eat(lparent);
-            Parser_ExprList();
+            CallFunction * c = new CallFunction(Parser_ExprList());
             eat(rparent);
-            break;
-
+            return c;
+        }
         case asterisk:
         case identifier:
-            Parser_IdList();
+        {
+            FatIdIdList* f = new FatIdIdList(Parser_IdList());
             eat(semicolon);
-            Parser_Stmt();
-            break;
-
+            return f;
+        }
         case dot:
         case arrow:
         case assignment:
         case lbrackets:
-            Parser_FatId1();
-            break;
+            return new FatIdFatId1(Parser_FatId1());
          
         default:
-            break;
+            return NULL;
     }
 }
 
@@ -529,94 +501,104 @@ FatId * Parser_FatId(){
 // Stmt -> readln ( Expr ) ;
 // Stmt -> throw;
 // Stmt -> try Stmt catch ( Stmt ) Stmt
-// Stmt -> id FatId ;
+// Stmt -> Type FatId ;
 Stmt* Parser_Stmt(){
     switch (token){
         case if_:
+        {
             eat(if_);
             eat(lparent);
-            Parser_Expr();
+            Expr * expr = Parser_Expr();
             eat(rparent);
-            Parser_Stmt();
-            Parser_Else();
-            break;
-
+            return new If(expr,Parser_Stmt(), Parser_Else());
+        }
         case while_:
+        {
             eat(while_);
             eat(lparent);
-            Parser_Expr();
+            Expr * e = Parser_Expr();
             eat(rparent);
             eat(lbraces);
-            Parser_Stmt();
+            Stmt * s = Parser_Stmt();
             eat(rbraces);
-            break;
-
+            return new While(e,s);
+        }
         case switch_:
+        {
             eat(switch_);
             eat(lparent);
-            Parser_Expr();
+            Expr * e = Parser_Expr();
             eat(rparent);
             eat(lbraces);
-            Parser_CaseBlock();
+            CaseBlock * cb = Parser_CaseBlock();
             eat(rbraces);
-            break;
-
+            return new Switch(e,cb);
+        }
         case break_:
             eat(break_);
             eat(semicolon);
-            break;
+            return new Break();
 
         case lbraces:
+        {
             eat(lbrackets);
-            Parser_StmtList();
+            Stmtl * s = Parser_StmtList();
             eat(rbrackets);
-            break;
-        
+            return s;
+        }
         case print_:
+        {
             eat(print_);
             eat(lparent);
-            Parser_ExprList();
+            ExprList * el = Parser_ExprList();
             eat(rparent);
             eat(semicolon);
-            break;
-        
+            return new Print(el);
+        }
         case readln_:
+        {
             eat(print_);
             eat(lparent);
-            Parser_Expr();
+            Expr * e = Parser_Expr();
             eat(rparent);
             eat(semicolon);
-            break;
-
+            return new Readln(e);
+        }
         case return_:
+        {
             eat(return_);
-            Parser_Expr();
+            Expr * e = Parser_Expr();
             eat(semicolon);
-            break;
-        
+            return new Return(e);
+        }
         case throw_:
             eat(throw_);
             eat(semicolon);
-            break;
+            return new Throw();
         
         case try_:
+        {
             eat(try_);
-            Parser_Stmt();
+            Stmt * s1 = Parser_Stmt();
             eat(catch_);
             eat(lparent);
-            Parser_Stmt();
+            Stmt * s2 = Parser_Stmt();
             eat(rparent);
-            Parser_Stmt();
-            break;
-        
-        case identifier:
-            eat(identifier);
-            Parser_FatId();
-            eat(semicolon);
-            break;
-
+            
+            return new Try(s1,s2,Parser_Stmt());
+        }
+            
     default:
-        error();
+        if(isType()){
+            Type * t = Parser_Type();
+            FatId * f = Parser_FatId();
+            eat(semicolon);
+            return new StmtFatId(t,f);
+        }
+        else{
+            error();
+            return NULL;
+        }
     }
 }
 
@@ -634,13 +616,15 @@ Pointer* Parser_Pointer() {
 // VarDecl -> Type IdList ; VarDecl
 // VarDecl -> ''
 VarDecl* Parser_VarDecl(){
-    if(!isType() || token !=identifier)
-        return;
+    if(!isType() || token !=identifier){
+        error();
+        return NULL;
+    }
         
-    Parser_Type();
-    Parser_IdList();
+    Type * t = Parser_Type();
+    IdList * id = Parser_IdList();
     eat(semicolon);
-    Parser_VarDecl();
+    return new VarDecl(t,id,Parser_VarDecl());
 }
 
 // IdList' -> , IdList
@@ -648,17 +632,16 @@ VarDecl* Parser_VarDecl(){
 IdListAux* Parser_IdListAux(){
     if(token == comma){
         eat(comma);
-        Parser_IdList();
+        return new IdListAux (Parser_IdList());
     }
-    else return;
+    else return NULL;
 }
 
 // IdList -> Pointer id Array IdList'
 IdList* Parser_IdList() {
-    Parser_Pointer();
-    eat(identifier);
-    Parser_Array();
-    Parser_IdListAux();
+    Pointer * p= Parser_Pointer();
+    Identifier * id = Parser_identifier();
+    return new IdList(p,id,Parser_Array(),Parser_IdListAux());
 }
 
 // FormalRest -> , FormaList
@@ -666,22 +649,21 @@ IdList* Parser_IdList() {
 FormalRest* Parser_FormalRest() {
     if(token == comma){
         eat(comma); 
-        Parser_FormaList();
+        return new FormalRest(Parser_FormaList());
     }
-    else return;
+    else return NULL;
 }
 
 // FormaList -> Type Pointer id Array FormalRest
 // FormaList -> ''
 FormaList* Parse_FormaList() {
     if(isType()){
-        Parser_Type();
-        Parser_Pointer();
+        Type * t = Parser_Type();
+        Pointer * p = Parser_Pointer();
         eat(identifier);
-        Parser_Array();
-        Parser_FormalRest();
+        return new FormaList(t,p,Parser_Array(),Parser_FormalRest());
     }
-    else return;
+    else return NULL;
 }    
 
 // Array -> [ NumInt ] Array
