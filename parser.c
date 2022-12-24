@@ -1073,7 +1073,6 @@ Program *S()
     x = new Interpreter();
     x->visit(p);
     printf("\n");
-    printf("Saiu\n");
     return p;
 }
 
