@@ -370,9 +370,10 @@ Expr *Expr9Aux()
 }
 
 // Expr9 -> F Expr9Aux
-Expr *Expr9()
-{
-    return new Expr(Parser_F(), Expr9Aux());
+Expr* Expr9() {
+    F *f = Parser_F();
+    Expr *e = Expr9Aux();
+    return new Expr(f, e);
 }
 
 // Expr8Aux -> * Expr9 Expr8Aux
@@ -468,35 +469,39 @@ Expr *Expr6Aux()
 }
 
 // Expr6 -> Expr7 Expr6Aux
-Expr *Expr6()
-{
-    return new Expr(Expr7(), Expr6Aux());
+Expr* Expr6() {
+    Expr *e1 = Expr7();
+    Expr *e2 = Expr6Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr5Aux -> == Expr6 Expr5Aux
 // Expr5Aux -> != Expr6 Expr5Aux
 // Expr5Aux -> ''
-Expr *Expr5Aux()
-{
-    switch (token)
-    {
-    case equality:
-        eat(equality);
-        return new Expr(Expr6(), Expr5Aux());
+Expr* Expr5Aux() {
+    switch(token){
+        case equality:
+        {
+            eat(equality);
+            Expr *e1 = Expr6();
+            Expr *e2 = Expr5Aux();
+            return new Expr(e1, e2);
+            // return new Expr(Expr6(), Expr5Aux());
+        }
+        case notEqual:
+            eat(notEqual);
+            return new Expr(Expr6(), Expr5Aux());
 
-    case notEqual:
-        eat(notEqual);
-        return new Expr(Expr6(), Expr5Aux());
-
-    default:
-        return NULL;
+        default:    
+            return NULL;
     }
 }
 
 // Expr5 -> Expr6 Expr5Aux
-Expr *Expr5()
-{
-    return new Expr(Expr6(), Expr5Aux());
+Expr* Expr5() {
+    Expr *e1 = Expr6();
+    Expr *e2 = Expr5Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr4Aux -> & Expr5 Expr4Aux
@@ -504,16 +509,10 @@ Expr *Expr5()
 Expr *Expr4Aux()
 {
     if (token == ampersand)
-    {
-        return new Expr(Expr5(), Expr4Aux());
-    }
-    else
-        return NULL;
 }
 
 // Expr4 -> Expr5 Expr4Aux
 Expr *Expr4()
-{
     return new Expr(Expr5(), Expr4Aux());
 }
 
@@ -565,10 +564,11 @@ Expr *ExprAux()
         return NULL;
 }
 
-// Expr -> Expr2 ExprAux
-Expr *Parser_Expr()
-{
-    return new Expr(Expr2(), ExprAux());
+//Expr -> Expr2 ExprAux
+Expr* Parser_Expr(){
+    Expr *e1 = Expr2();
+    Expr *ea1 = ExprAux();
+    return new Expr(e1, ea1);
 }
 
 // Else-> else Stmt
@@ -586,14 +586,15 @@ Else *Parser_Else()
 
 // StmtList -> Stmt StmtList
 // StmtList -> ''
-Stmtl *Parser_StmtList()
-{
-    if (isStmt())
-    {
-        return new Stmtl(Parser_Stmt(), Parser_StmtList());
+Stmtl* Parser_StmtList(){
+    if(isStmt()) {
+        Stmt *s = Parser_Stmt();
+        Stmtl *sl = Parser_StmtList();
+        return new Stmtl(s, sl);
     }
-    else
-        return NULL;
+    else {
+      return NULL;
+    }
 }
 
 // FatId1 -> dot Expr
@@ -677,44 +678,42 @@ FatId *Parser_FatId()
 // Stmt -> throw;
 // Stmt -> try Stmt catch ( Stmt ) Stmt
 // Stmt -> Type FatId ;
-Stmt *Parser_Stmt()
-{
-    switch (token)
-    {
-    case if_:
-    {
-        eat(if_);
-        eat(lparent);
-        Expr *expr = Parser_Expr();
-        eat(rparent);
-        return new If(expr, Parser_Stmt(), Parser_Else());
-    }
-    case while_:
-    {
-        eat(while_);
-        eat(lparent);
-        Expr *e = Parser_Expr();
-        eat(rparent);
-        eat(lbraces);
-        Stmt *s = Parser_Stmt();
-        eat(rbraces);
-        return new While(e, s);
-    }
-    case switch_:
-    {
-        eat(switch_);
-        eat(lparent);
-        Expr *e = Parser_Expr();
-        eat(rparent);
-        eat(lbraces);
-        CaseBlock *cb = Parser_CaseBlock();
-        eat(rbraces);
-        return new Switch(e, cb);
-    }
-    case break_:
-        eat(break_);
-        eat(semicolon);
-        return new Break();
+Stmt* Parser_Stmt(){
+    switch (token){
+        case if_:
+        {
+            eat(if_);
+            eat(lparent);
+            Expr * expr = Parser_Expr();
+            eat(rparent);
+            return new If(expr,Parser_Stmt(), Parser_Else());
+        }
+        case while_:
+        {
+            eat(while_);
+            eat(lparent);
+            Expr * e = Parser_Expr();
+            eat(rparent);
+            // eat(lbraces);
+            Stmt * s = Parser_Stmt();
+            // eat(rbraces);
+            return new While(e,s);
+        }
+        case switch_:
+        {
+            eat(switch_);
+            eat(lparent);
+            Expr * e = Parser_Expr();
+            eat(rparent);
+            eat(lbraces);
+            CaseBlock * cb = Parser_CaseBlock();
+            eat(rbraces);
+            return new Switch(e,cb);
+        }
+        case break_:
+            eat(break_);
+            eat(semicolon);
+            return new Break();
 
     case lbraces:
     {

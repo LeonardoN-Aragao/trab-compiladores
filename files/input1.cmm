@@ -1,1 +1,3 @@
-int getTotalTickets(Process *plist){}
+int getToken(Node *n){
+  while(x==2) x=x-1 ;
+}
