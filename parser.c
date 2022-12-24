@@ -4,21 +4,91 @@
 #include "lexic.h"
 #include "AST.h"
 #include "Visitor.h"
-// #include "errorManager.h"
+#include "errorManager.h"
 
 // ------------ REMOVER ??? ---------------
 
 lexical *lex;
 int token = 0;
 Interpreter *x;
+errorManager error;
+
+int synchronizationSetType[] = {identifier, asterisk, lbrackets, dot, arrow, ampersand, assignment, lparent};
+int synchronizationSetF[] = {rbrackets, semicolon, rparent, comma, orSign, andSign, verticalPipe, ampersand, equality, notEqual, lessSign, great, lessOrEqual, greaterOrEqual, plusSign, minusSign, asterisk, slash, percent, exclamation};
+int synchronizationSetFatId1[] = {semicolon};
+int synchronizationSetSTMT[] = {rbraces, while_, switch_, break_, lbraces, print_, readln_, return_, throw_, try_, if_, long_, int_, float_, bool_, identifier, char_, double_, rbrackets, catch_, else_, case_};
+
+const char *getTokenName(int value)
+{
+#define NAME(ERR) \
+    case ERR:     \
+        return #ERR;
+    switch (value)
+    {
+        NAME(lbrackets)
+        NAME(asterisk)
+        NAME(lparent)
+        NAME(comma)
+        NAME(colon)
+        NAME(rparent)
+        NAME(rbraces)
+        NAME(percent)
+        NAME(lbraces)
+        NAME(plusSign)
+        NAME(rbrackets)
+        NAME(backslash)
+        NAME(arrow)
+        NAME(equality)
+        NAME(orSign)
+        NAME(andSign)
+        NAME(greaterOrEqual)
+        NAME(notEqual)
+        NAME(lessOrEqual)
+        NAME(semicolon)
+        NAME(exclamation)
+        NAME(assignment)
+        NAME(ampersand)
+        NAME(great)
+        NAME(minusSign)
+        NAME(verticalPipe)
+        NAME(lessSign)
+        NAME(slash)
+        NAME(dot)
+        NAME(EOF)
+        NAME(identifier)
+        NAME(literal)
+        NAME(numInt)
+        NAME(numFloat)
+        NAME(int_)
+        NAME(float_)
+        NAME(bool_)
+        NAME(char_)
+        NAME(double_)
+        NAME(long_)
+        NAME(if_)
+        NAME(else_)
+        NAME(while_)
+        NAME(switch_)
+        NAME(case_)
+        NAME(break_)
+        NAME(print_)
+        NAME(readln_)
+        NAME(return_)
+        NAME(throw_)
+        NAME(try_)
+        NAME(catch_)
+        NAME(true_)
+        NAME(false_)
+        NAME(typedef_)
+        NAME(struct_)
+    }
+    return "unknown";
+#undef NAME
+}
 
 // ----------------------------------------
 
 // Errors ------------------------------------------------
-void error(char *s)
-{
-    printf("Error: %s!!!\n", s);
-}
 
 void errorEat(int a, int b)
 {
@@ -74,6 +144,24 @@ void eat(int t)
         advance();
     else
         errorEat(token, t);
+}
+
+void synchronizingError(int *follow)
+{
+    printf("synchronizingError\n");
+    int i = 0;
+    while (token != EOF)
+    {
+        while (follow[i] != NULL)
+        {
+            if (follow[i] != token)
+                i++;
+            else
+                return;
+        }
+        advance();
+        i = 0;
+    }
 }
 
 int isType()
@@ -159,7 +247,12 @@ F *Parser_F()
         return f;
     }
     default:
-        error("F");
+        char *str = (char *)malloc(100);
+        snprintf(str, 100, "Erro sintático: Identificador %s inválido", getTokenName(token));
+        error = createError(8, str);
+        printError(error);
+        synchronizingError(synchronizationSetF);
+        free(str);
         return NULL;
     }
 }
@@ -185,11 +278,9 @@ Num *Parser_Num()
         return f;
     }
     default:
-        error("Num");
         return NULL;
     }
 }
-
 // Type -> long
 // Type -> int
 // Type -> float
@@ -197,9 +288,8 @@ Num *Parser_Num()
 // Type -> ID
 // Type -> char
 // Type -> double
-Type *Parser_Type()
-{
 
+Type *Parser_Type() {
     switch (token)
     {
     case int_:
@@ -242,7 +332,12 @@ Type *Parser_Type()
         return Parser_identifier();
 
     default:
-        error("Type");
+        char *str = (char *)malloc(100);
+        snprintf(str, 100, "Erro sintático: Tipo %s inválido", getTokenName(token));
+        error = createError(9, str);
+        printError(error);
+        synchronizingError(synchronizationSetType);
+        free(str);
         return NULL;
     }
 }
@@ -368,7 +463,6 @@ Expr *Expr7()
 // Expr6Aux -> < Expr7 Expr6Aux
 // Expr6Aux -> > Expr7 Expr6Aux
 // Expr6Aux -> <= Expr7 Expr6Aux
-// Expr6Aux -> >= Expr7 Expr6Aux
 // Expr6Aux -> ''
 Expr *Expr6Aux()
 {
@@ -531,12 +625,8 @@ Expr *ExprAux()
         Expr *e1 = Expr2();
         Expr *e2 = ExprAux();
         return new Expr(e1, e2);
-        // return new Expr(Expr2(), ExprAux());
     }
-    else
-        return NULL;
 }
-
 // Expr -> Expr2 ExprAux
 Expr *Parser_Expr()
 {
@@ -602,7 +692,12 @@ FatId1 *Parser_FatId1()
         return b;
     }
     default:
-        error("FatId1");
+        char *str = (char *)malloc(100);
+        snprintf(str, 100, "Erro sintático: Caracter %s inválido", getTokenName(token));
+        error = createError(11, str);
+        printError(error);
+        synchronizingError(synchronizationSetFatId1);
+        free(str);
         return NULL;
     }
 }
@@ -737,7 +832,6 @@ Stmt *Parser_Stmt()
 
         return new Try(s1, s2, Parser_Stmt());
     }
-
     default:
         if (isType())
         {
@@ -748,7 +842,12 @@ Stmt *Parser_Stmt()
         }
         else
         {
-            error("Stmt");
+            char *str = (char *)malloc(100);
+            snprintf(str, 100, "Erro sintático: Expressão %s inválido", getTokenName(token));
+            error = createError(10, str);
+            printError(error);
+            synchronizingError(synchronizationSetSTMT);
+            free(str);
             return NULL;
         }
     }
