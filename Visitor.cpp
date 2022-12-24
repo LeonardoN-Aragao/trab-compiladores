@@ -112,6 +112,24 @@ void AssingmentFatId1::accept(Visitor *v){ v->visit(this); };
 void ExprListTailAux::accept(Visitor *v){ v->visit(this); };
 void Literal::accept(Visitor *v){ v->visit(this); };
 
+void Expr2::accept(Visitor *v){ v->visit(this); };
+void Expr2Aux::accept(Visitor *v){ v->visit(this); };
+void Expr3Aux::accept(Visitor *v){ v->visit(this); };
+void Expr3::accept(Visitor *v){ v->visit(this); };
+void Expr4Aux::accept(Visitor *v){ v->visit(this); };
+void Expr4::accept(Visitor *v){ v->visit(this); };
+void Expr5Aux::accept(Visitor *v){ v->visit(this); };
+void Expr5::accept(Visitor *v){ v->visit(this); };
+void Expr6Aux::accept(Visitor *v){ v->visit(this); };
+void Expr6::accept(Visitor *v){ v->visit(this); };
+void Expr7Aux::accept(Visitor *v){ v->visit(this); };
+void Expr7::accept(Visitor *v){ v->visit(this); };
+void Expr8Aux::accept(Visitor *v){ v->visit(this); };
+void Expr8::accept(Visitor *v){ v->visit(this); };
+void Expr9Aux::accept(Visitor *v){ v->visit(this); };
+void Expr9Class::accept(Visitor *v){ v->visit(this); };
+
+
 void Interpreter::visit(PlusExp *n) {
    // Desce na árvore
    if(n->e1 != nullptr) n->e1->accept(this);
@@ -563,49 +581,122 @@ void Interpreter::visit(ProgramL *n) {
    lvl_prev();
 }
 
-   void Interpreter::visit(F *n) {
-      n->ex1->accept(this);
-   }
-   void Interpreter::visit(ExprList *n) {
-      n->elt->accept(this);
-   }
-   void Interpreter::visit(ExprListTail *n) {
-      n->expr->accept(this);
-      n->elt->accept(this);
-   }
-   void Interpreter::visit(IdListAux *n) {
-      print(",");
-      n->il->accept(this);
-   }
-   void Interpreter::visit(FatId1 *n) {}
-   void Interpreter::visit(Stmt *n) {}
-   void Interpreter::visit(Expr *n) {
-      print("EXPR");
-   }
-   void Interpreter::visit(Identifier *n) {
-      // if(n->token_name != nullptr)  n->accept(this);
-      // printf("%s", n->token_name);
-      print(n->token_name);
-   }
-   void Interpreter::visit(Num *n) {
-      print("num");
-   }
-   void Interpreter::visit(Type *n) {}
-   void Interpreter::visit(IdList*n) {}
-   void Interpreter::visit(FatId *n) {}
+void Interpreter::visit(F *n) {
+   n->ex1->accept(this);
+}
+void Interpreter::visit(ExprList *n) {
+   n->elt->accept(this);
+}
+void Interpreter::visit(ExprListTail *n) {
+   n->expr->accept(this);
+   n->elt->accept(this);
+}
+void Interpreter::visit(IdListAux *n) {
+   print(",");
+   n->il->accept(this);
+}
+void Interpreter::visit(FatId1 *n) {}
+void Interpreter::visit(Stmt *n) {}
+void Interpreter::visit(Expr *n) {
+   print("EXPR");
+}
+void Interpreter::visit(Identifier *n) {
+   // if(n->token_name != nullptr)  n->accept(this);
+   // printf("%s", n->token_name);
+   print(n->token_name);
+}
+void Interpreter::visit(Num *n) {
+   print("num");
+}
+void Interpreter::visit(Type *n) {}
+void Interpreter::visit(IdList*n) {}
+void Interpreter::visit(FatId *n) {}
 
-   void Interpreter::visit(Int *n) {
-      print((char*)n->value);
-      printf("%d", n->value);
-   };
-	void Interpreter::visit(Float *n) {
-      // print((char*)n->value);
-   };
+void Interpreter::visit(Int *n) {
+   print((char*)n->value);
+   printf("%d", n->value);
+};
+void Interpreter::visit(Float *n) {
+   // print((char*)n->value);
+};
 
-   void Interpreter::print(char *s) {
-      for(int i=0; i<this->height; i++) {
-         printf(" ");
-      }
-      printf("%s\n", s);
+void Interpreter::print(char *s) {
+   for(int i=0; i<this->height; i++) {
+      printf(" ");
    }
-   // }
+   printf("%s\n", s);
+}
+// }
+
+void Interpreter::visit(Expr2 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr2Aux *n) {
+   print("&&");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr3 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr3Aux *n) {
+   print("|");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr4 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr4Aux *n) {
+   print("&");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr5 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr5Aux *n) {
+   print("==");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr6 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr6Aux *n) {
+   print("<");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr7 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr7Aux *n) {
+   print("+");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr8 *n) {
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr8Aux *n) {
+   print("*");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr9Class *n) {
+   n->f->accept(this);
+   n->ex2->accept(this);
+};
+void Interpreter::visit(Expr9Aux *n) {
+   print("Unary");
+   n->ex1->accept(this);
+   n->ex2->accept(this);
+};

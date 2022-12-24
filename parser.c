@@ -255,22 +255,34 @@ Expr* Expr9() {
 // Expr8Aux -> / Expr9 Expr8Aux
 // Expr8Aux -> % Expr9 Expr8Aux
 // Expr8Aux -> ''
-Expr* Expr8Aux() {
+Expr * Expr8Aux() {
      switch(token){
         case asterisk:
+        {
             eat(asterisk);
-            return new Expr(Expr9(), Expr8Aux());
+            Expr *e1 = Expr9();
+            Expr *e2 = Expr8Aux();
+            return new Expr(e1, e2);
             break;
+        }
 
         case slash:
+        {
             eat(slash);
-            return new Expr(Expr9(), Expr8Aux());
+            Expr *e1 = Expr9();
+            Expr *e2 = Expr8Aux();
+            return new Expr(e1, e2);
             break;
+        }
 
         case percent:
+        {
             eat(percent);
-            return new Expr(Expr9(), Expr8Aux());
+            Expr *e1 = Expr9();
+            Expr *e2 = Expr8Aux();
+            return new Expr(e1, e2);
             break;
+        }
 
         default:    
             return NULL;
@@ -279,7 +291,9 @@ Expr* Expr8Aux() {
 
 // Expr8 -> Expr9 Expr8Aux
 Expr* Expr8() {
-    return new Expr(Expr9(), Expr8Aux());
+    Expr *e1 = Expr9();
+    Expr *e2 = Expr8Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr7Aux -> + Expr8 Expr7Aux
@@ -288,15 +302,22 @@ Expr* Expr8() {
 Expr* Expr7Aux() {
     switch(token){
         case plusSign:
+        {
             eat(plusSign);
-            return new Expr(Expr8(), Expr7Aux());
+            Expr *e1 = Expr8();
+            Expr *e2 = Expr7Aux();
+            return new Expr(e1, e2);
             break;
+        }
 
         case minusSign:
+        {
             eat(minusSign);
-            return new Expr(Expr8(), Expr7Aux());
+            Expr *e1 = Expr8();
+            Expr *e2 = Expr7Aux();
+            return new Expr(e1, e2);
             break;
-
+        }
         default:    
             return NULL;
     }
@@ -304,7 +325,9 @@ Expr* Expr7Aux() {
 
 // Expr7 -> Expr8 Expr7Aux
 Expr* Expr7() {
-    return new Expr(Expr8(), Expr7Aux());
+    Expr *e1 = Expr8();
+    Expr *e2 = Expr7Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr6Aux -> < Expr7 Expr6Aux
@@ -315,20 +338,28 @@ Expr* Expr7() {
 Expr* Expr6Aux() {
     switch(token){
         case lessSign:
-            eat(lessSign);
-            return new Expr(Expr7(), Expr6Aux());
+           { eat(lessSign);
+            Expr *e1 = Expr7();
+            Expr *e2 = Expr6Aux();
+            return new Expr(e1, e2);}
 
         case great:
-            eat(great);
-            return new Expr(Expr7(), Expr6Aux());
+            {eat(great);
+            Expr *e1 = Expr7();
+            Expr *e2 = Expr6Aux();
+            return new Expr(e1, e2);}
         
         case lessOrEqual:
-            eat(lessOrEqual);
-            return new Expr(Expr7(), Expr6Aux());
+            {eat(lessOrEqual);
+            Expr *e1 = Expr7();
+            Expr *e2 = Expr6Aux();
+            return new Expr(e1, e2);}
 
         case greaterOrEqual:
-            eat(greaterOrEqual);
-            return new Expr(Expr7(), Expr6Aux());
+            {eat(greaterOrEqual);
+            Expr *e1 = Expr7();
+            Expr *e2 = Expr6Aux();
+            return new Expr(e1, e2);}
 
         default:    
             return NULL;
@@ -356,8 +387,10 @@ Expr* Expr5Aux() {
             // return new Expr(Expr6(), Expr5Aux());
         }
         case notEqual:
-            eat(notEqual);
-            return new Expr(Expr6(), Expr5Aux());
+            {eat(notEqual);
+            Expr *e1 = Expr6();
+            Expr *e2 = Expr5Aux();
+            return new Expr(e1, e2);}
 
         default:    
             return NULL;
@@ -375,49 +408,65 @@ Expr* Expr5() {
 // Expr4Aux -> ''
 Expr* Expr4Aux() {
     if(token == ampersand){
-        return new Expr(Expr5(), Expr4Aux());
+        Expr *e1 = Expr5();
+        Expr *e2 = Expr4Aux();
+        return new Expr(e1, e2);
     }
     else return NULL;
 }
 
 // Expr4 -> Expr5 Expr4Aux
 Expr* Expr4() {
-    return new Expr(Expr5(), Expr4Aux());
+    Expr *e1 = Expr5();
+    Expr *e2 = Expr4Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr3Aux -> | Expr4 Expr3Aux
 // Expr3Aux -> ''
 Expr* Expr3Aux() {
     if(token == verticalPipe){
-        return new Expr(Expr4(), Expr3Aux());
+        Expr *e1 = Expr4();
+        Expr *e2 = Expr3Aux();
+        return new Expr(e1, e2);
     }
     else return NULL;
 }
 
 // Expr3 -> Expr4 Expr3Aux
 Expr* Expr3() {
-    return new Expr(Expr4(), Expr3Aux());
+    Expr *e1 = Expr4();
+    Expr *e2 = Expr3Aux();
+    return new Expr(e1, e2);
 }
 
 // Expr2Aux -> && Expr3 Expr2Aux
 // Expr2Aux -> ''
 Expr* Expr2Aux() {
     if(token == andSign){
-        return new Expr(Expr3(), Expr2Aux());
+        Expr *e1 = Expr3();
+        Expr *e2 = Expr2Aux();
+        return new Expr(e1, e2);
     }
     else return NULL;
 }
 
 // Expr2 -> Expr3 Expr2Aux
 Expr* Expr2() {
-    return new Expr(Expr3(), Expr2Aux());
+    Expr *e1 = Expr3();
+    Expr *e2 = Expr2Aux();
+    return new Expr(e1, e2);
+    // return new Expr(Expr3(), Expr2Aux());
 }
 
 // ExprAux -> || Expr2 ExprAux
 // ExprAux -> ''
 Expr* ExprAux(){
     if(token == orSign){
-        return new Expr(Expr2(), ExprAux());
+        Expr *e1 = Expr2();
+        Expr *e2 = ExprAux();
+        return new Expr(e1, e2);
+        // return new Expr(Expr2(), ExprAux());
     }
     else return NULL;
 }

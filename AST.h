@@ -53,6 +53,120 @@ class Expr: public Node {
 		Expr* ex1; Expr * ex2;
 		void accept(Visitor *v);
 };
+class F;
+
+class Expr9Aux: public Expr { 
+	public:
+		Expr9Aux(Expr9Aux* e) { ex1 = e; }
+		Expr9Aux* ex1;
+		void accept(Visitor *v);
+};
+class Expr9Class: public Expr { 
+	public: 
+		Expr9Class(F* f, Expr9Aux * e) { f = f; e = e; }
+		F* f; Expr9Aux * e;
+		void accept(Visitor *v);
+};
+
+class Expr8Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr8Aux(Expr9Class* e1, Expr8Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr9Class* ex1; Expr8Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr8: public Expr { 
+	public: 
+		// Expr(){};
+		Expr8(Expr9Class* e1, Expr8Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr9Class* ex1; Expr8Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr7Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr7Aux(Expr8* e1, Expr7Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr8* ex1; Expr7Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr7: public Expr { 
+	public: 
+		// Expr(){};
+		Expr7(Expr8* e1, Expr7Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr8* ex1; Expr7Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr6Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr6Aux(Expr7* e1, Expr6Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr7* ex1; Expr6Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr6: public Expr { 
+	public: 
+		// Expr(){};
+		Expr6(Expr7* e1, Expr6Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr7* ex1; Expr6Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr5Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr5Aux(Expr6* e1, Expr5Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr6* ex1; Expr5Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr5: public Expr { 
+	public: 
+		// Expr(){};
+		Expr5(Expr6* e1, Expr5Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr6* ex1; Expr5Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr4Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr4Aux(Expr5* e1, Expr4Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr5* ex1; Expr4Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr4: public Expr { 
+	public: 
+		// Expr(){};
+		Expr4(Expr5* e1, Expr4Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr5* ex1; Expr4Aux * ex2;
+		void accept(Visitor *v);
+};
+
+class Expr3Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr3Aux(Expr4* e1, Expr3Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr4* ex1; Expr3Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr3: public Expr { 
+	public: 
+		// Expr(){};
+		Expr3(Expr4* e1, Expr3Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr4* ex1; Expr3Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr2Aux: public Expr { 
+	public: 
+		// Expr(){};
+		Expr2Aux(Expr3* e1, Expr2Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr3* ex1; Expr2Aux * ex2;
+		void accept(Visitor *v);
+};
+class Expr2: public Expr { 
+	public: 
+		// Expr(){};
+		Expr2(Expr3* e1, Expr2Aux * e2) { ex1 = e1; ex2 = e2; }
+		Expr3* ex1; Expr2Aux * ex2;
+		void accept(Visitor *v);
+};
 
 class F : public Expr { public: F(){}; void accept(Visitor *v);};
 

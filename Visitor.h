@@ -74,6 +74,22 @@ public:
    virtual void visit(DoubleType *n) = 0;
 	virtual void visit(Int *n) = 0;
 	virtual void visit(Float *n) = 0;
+	virtual void visit(Expr2 *n) = 0;
+	virtual void visit(Expr2Aux *n) = 0;
+	virtual void visit(Expr3 *n) = 0;
+	virtual void visit(Expr3Aux *n) = 0;
+	virtual void visit(Expr4 *n) = 0;
+	virtual void visit(Expr4Aux *n) = 0;
+	virtual void visit(Expr5 *n) = 0;
+	virtual void visit(Expr5Aux *n) = 0;
+	virtual void visit(Expr6 *n) = 0;
+	virtual void visit(Expr6Aux *n) = 0;
+	virtual void visit(Expr7 *n) = 0;
+	virtual void visit(Expr7Aux *n) = 0;
+	virtual void visit(Expr8 *n) = 0;
+	virtual void visit(Expr8Aux *n) = 0;
+	virtual void visit(Expr9Class *n) = 0;
+	virtual void visit(Expr9Aux *n) = 0;	
 };
 
 // Accepts definitions -------------------------------------------------------
@@ -153,6 +169,22 @@ public:
    void visit(FatId *n) override;
 	void visit(Int *n) override;
 	void visit(Float *n) override;
+	void visit(Expr2 *n) override;
+	void visit(Expr2Aux *n) override;
+	void visit(Expr3 *n) override;
+	void visit(Expr3Aux *n) override;
+	void visit(Expr4 *n) override;
+	void visit(Expr4Aux *n) override;
+	void visit(Expr5 *n) override;
+	void visit(Expr5Aux *n) override;
+	void visit(Expr6 *n) override;
+	void visit(Expr6Aux *n) override;
+	void visit(Expr7 *n) override;
+	void visit(Expr7Aux *n) override;
+	void visit(Expr8 *n) override;
+	void visit(Expr8Aux *n) override;
+	void visit(Expr9Class *n) override;
+	void visit(Expr9Aux *n) override;
 };
 
 #endif /* BC34D1E5_751D_42A4_B2B3_C7545FE1A533 */
