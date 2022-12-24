@@ -148,16 +148,13 @@ void eat(int t)
 
 void synchronizingError(int *follow)
 {
-    printf("synchronizingError\n");
     int i = 0;
     while (token != EOF)
     {
         while (follow[i] != NULL)
         {
-            if (follow[i] != token)
-                i++;
-            else
-                return;
+            if (follow[i] != token) i++;
+            else return;
         }
         advance();
         i = 0;
