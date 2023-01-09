@@ -6,22 +6,6 @@
 class Visitor {
 public:
    virtual ~Visitor() = default;
-   virtual void visit(PlusExp *n) = 0;
-   virtual void visit(MinusExp *n) = 0;
-   virtual void visit(TimesExp *n) = 0;
-   virtual void visit(DivideExp *n) = 0;
-   virtual void visit(EqualsExp *n) = 0;
-   virtual void visit(DifferentExp *n) = 0;
-   virtual void visit(LowerExp *n) = 0;
-   virtual void visit(GraterExp *n) = 0;
-   virtual void visit(LowerEqualExp *n) = 0;
-   virtual void visit(GraterEqualExp *n) = 0;
-   virtual void visit(AndExp *n) = 0;
-   virtual void visit(OrExp *n) = 0;
-   virtual void visit(RemainderExp *n) = 0;
-   virtual void visit(AndBitABitExp *n) = 0;
-   virtual void visit(OrBitABitExp *n) = 0;
-   virtual void visit(IntergerLiteral *n) = 0;
    virtual void visit(Program *n) = 0;
    virtual void visit(ProgramL *n) = 0;
    virtual void visit(Pointer *n) = 0;
@@ -35,8 +19,8 @@ public:
    virtual void visit(BoolType *n) = 0;
    virtual void visit(CharType *n) = 0;
    virtual void visit(Identifier *n) = 0;
+   virtual void visit(Identifier_F *n) = 0;
    virtual void visit(VarDecl *n) = 0;
-   virtual void visit(Expr *n) = 0;
    virtual void visit(Stmt *n) = 0;
    virtual void visit(Break *n) = 0;
    virtual void visit(Throw *n) = 0;
@@ -54,9 +38,9 @@ public:
    virtual void visit(Stmtl *n) = 0;
    virtual void visit(FatId *n) = 0;
    virtual void visit(FatId1 *n) = 0;
-   virtual void visit(CallFunction *n) = 0;
-   virtual void visit(FatIdIdList *n) = 0;
-   virtual void visit(FatIdFatId1 *n) = 0;
+   // virtual void visit(CallFunction *n) = 0;
+   // virtual void visit(FatIdIdList *n) = 0;
+   // virtual void visit(FatIdFatId1 *n) = 0;
    virtual void visit(DotFatId1 *n) = 0;
    virtual void visit(ArrowFatId1 *n) = 0;
    virtual void visit(AmpersandFatId1 *n) = 0;
@@ -68,13 +52,16 @@ public:
    virtual void visit(ExprListTail *n) = 0;
    virtual void visit(ExprList *n) = 0;
    virtual void visit(F *n) = 0;
+   virtual void visit(F_Expr *n) = 0;
    virtual void visit(TypeDecl *n) = 0;
    virtual void visit(FunctionOrVarDecl *n) = 0;
    virtual void visit(FormaList *n) = 0;
    virtual void visit(DoubleType *n) = 0;
 	virtual void visit(Int *n) = 0;
 	virtual void visit(Float *n) = 0;
-	virtual void visit(Expr2 *n) = 0;
+	virtual void visit(Expr *n) = 0;
+	virtual void visit(ExprAux *n) = 0;
+   virtual void visit(Expr2 *n) = 0;
 	virtual void visit(Expr2Aux *n) = 0;
 	virtual void visit(Expr3 *n) = 0;
 	virtual void visit(Expr3Aux *n) = 0;
@@ -88,7 +75,7 @@ public:
 	virtual void visit(Expr7Aux *n) = 0;
 	virtual void visit(Expr8 *n) = 0;
 	virtual void visit(Expr8Aux *n) = 0;
-	virtual void visit(Expr9Class *n) = 0;
+	virtual void visit(Expr9 *n) = 0;
 	virtual void visit(Expr9Aux *n) = 0;	
 };
 
@@ -96,27 +83,28 @@ public:
 class Interpreter: public Visitor {
 private:
 	int height;
-	void lvl_next();
-	void lvl_prev();
-   void print(char *s);
+	void lvl_next() {this->height++;};
+	void lvl_prev() {this->height--;};
+   void print(char *s) {
+      for(int i=0; i<this->height; i++) {
+         printf(" ");
+      }
+      printf("%s\n", s);
+   };
+   void print(int s) {
+      for(int i=0; i<this->height; i++) {
+         printf(" ");
+      }
+      printf("%d\n", s);
+   };
+   void print(float s) {
+      for(int i=0; i<this->height; i++) {
+         printf(" ");
+      }
+      printf("%f\n", s);
+   };
 public:
-	Interpreter();
-   void visit(PlusExp *n) override;
-	void visit(MinusExp *n) override;
-	void visit(TimesExp *n) override;
-	void visit(DivideExp *n) override;
-	void visit(EqualsExp *n) override;
-	void visit(DifferentExp *n) override;
-	void visit(LowerExp *n) override;
-	void visit(GraterExp *n) override;
-	void visit(LowerEqualExp *n) override;
-	void visit(GraterEqualExp *n) override;
-	void visit(AndExp *n) override;
-	void visit(OrExp *n) override;
-	void visit(RemainderExp *n) override;
-	void visit(AndBitABitExp *n) override;
-	void visit(OrBitABitExp *n) override;
-	void visit(IntergerLiteral *n) override;
+	Interpreter() { this->height=0; };
 	void visit(ExprListTailAux *n) override;
 	void visit(CaseBlock *n) override;
 	void visit(DotFatId1 *n) override;
@@ -124,9 +112,9 @@ public:
 	void visit(AmpersandFatId1 *n) override;
 	void visit(AssingmentFatId1 *n) override;
 	void visit(BracketFatId1 *n) override;
-	void visit(CallFunction *n) override;
-	void visit(FatIdIdList *n) override;
-	void visit(FatIdFatId1 *n) override;
+	// void visit(CallFunction *n) override;
+	// void visit(FatIdIdList *n) override;
+	// void visit(FatIdFatId1 *n) override;
 	void visit(Else *n) override;
 	void visit(While *n) override;
 	void visit(Switch *n) override;
@@ -156,19 +144,22 @@ public:
    void visit(Program *n) override;
    void visit(ProgramL *n) override;
    void visit(F *n) override;
+   void visit(F_Expr *n) override;
    void visit(ExprList *n) override;
    void visit(ExprListTail *n) override;
    void visit(IdListAux *n) override;
    void visit(FatId1 *n) override;
    void visit(Stmt *n) override;
-   void visit(Expr *n) override;
    void visit(Identifier *n) override;
+   void visit(Identifier_F *n) override;
    void visit(Num *n) override;
    void visit(Type *n) override;
    void visit(IdList*n) override;
    void visit(FatId *n) override;
 	void visit(Int *n) override;
 	void visit(Float *n) override;
+	void visit(Expr *n) override;
+	void visit(ExprAux *n) override;
 	void visit(Expr2 *n) override;
 	void visit(Expr2Aux *n) override;
 	void visit(Expr3 *n) override;
@@ -183,7 +174,7 @@ public:
 	void visit(Expr7Aux *n) override;
 	void visit(Expr8 *n) override;
 	void visit(Expr8Aux *n) override;
-	void visit(Expr9Class *n) override;
+	void visit(Expr9 *n) override;
 	void visit(Expr9Aux *n) override;
 };
 

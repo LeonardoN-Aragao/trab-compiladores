@@ -1,9 +1,5 @@
-int main(int argc, char **argv)
-{
+int main(int argc, char *argv){
    double timespent = 0.0;
-   /* este comentario pode se 
-   estender 
-   por varias linhas */
    if (argc > 1)
    {
       fileName = argv[1];
@@ -17,3 +13,4 @@ int main(int argc, char **argv)
          printf("final  %s \n", con);
       }
    }
+}
