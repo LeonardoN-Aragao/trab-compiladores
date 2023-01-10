@@ -141,7 +141,7 @@ void advance() { token = nextToken(lex); }
 void eat(int t)
 {
     if (token == t) {
-        printf("%s\n", getTokenName(token));
+        // printf("%s\n", getTokenName(token));
         advance();
     }
     else
@@ -198,6 +198,7 @@ Program *S()
     Program *p = Parser_Program();
     eat(EOF);
     x = new Interpreter();
+    printf("VISITOR\n");
     x->visit(p);
     printf("\n");
     return p;
@@ -377,11 +378,11 @@ FormaList *Parser_FormaList()
     {
         Type *t = Parser_Type();
         Pointer *p = Parser_Pointer();
-        Identifier *id = Parser_identifier();
+        Identifier *i = Parser_identifier();
         // eat(identifier);
         Array *a = Parser_Array();
         FormalRest *fr = Parser_FormalRest();
-        return new FormaList(t, p, a, fr, id);
+        return new FormaList(t, p, a, fr, i);
     }
     else
         return NULL;
@@ -787,13 +788,13 @@ Expr5Aux *Parser_Expr5Aux() {
 		eat(equality);
 		Expr6 *e1 = Parser_Expr6();
 		Expr5Aux *e2 = Parser_Expr5Aux();
-		return new Expr5Aux(e1, e2);
+		return new Expr5Aux(e1, e2, getTokenName(equality));
 	}
 	case notEqual: {
 		eat(notEqual);
 		Expr6 *e1 = Parser_Expr6();
 		Expr5Aux *e2 = Parser_Expr5Aux();
-		return new Expr5Aux(e1, e2);
+		return new Expr5Aux(e1, e2, getTokenName(notEqual));
 	}
 	default:
 		return NULL;
@@ -817,25 +818,25 @@ Expr6Aux *Parser_Expr6Aux() {
 		eat(lessSign);
 		Expr7 *e1 = Parser_Expr7();
 		Expr6Aux *e2 = Parser_Expr6Aux();
-		return new Expr6Aux(e1, e2);
+		return new Expr6Aux(e1, e2, getTokenName(lessSign));
 	}
 	case great: {
 		eat(great);
 		Expr7 *e1 = Parser_Expr7();
 		Expr6Aux *e2 = Parser_Expr6Aux();
-		return new Expr6Aux(e1, e2);
+		return new Expr6Aux(e1, e2, getTokenName(great));
 	}
 	case lessOrEqual: {
 		eat(lessOrEqual);
 		Expr7 *e1 = Parser_Expr7();
 		Expr6Aux *e2 = Parser_Expr6Aux();
-		return new Expr6Aux(e1, e2);
+		return new Expr6Aux(e1, e2, getTokenName(lessOrEqual));
 	}
 	case greaterOrEqual: {
 		eat(greaterOrEqual);
 		Expr7 *e1 = Parser_Expr7();
 		Expr6Aux *e2 = Parser_Expr6Aux();
-		return new Expr6Aux(e1, e2);
+		return new Expr6Aux(e1, e2, getTokenName(greaterOrEqual));
 	}
 	default:
 		return NULL;
@@ -858,14 +859,14 @@ Expr7Aux *Parser_Expr7Aux() {
 		eat(plusSign);
 		Expr8 *e1 = Parser_Expr8();
 		Expr7Aux *e2 = Parser_Expr7Aux();
-		return new Expr7Aux(e1, e2);
+		return new Expr7Aux(e1, e2, getTokenName(plusSign));
 		break;
 	}
 	case minusSign: {
 		eat(minusSign);
 		Expr8 *e1 = Parser_Expr8();
 		Expr7Aux *e2 = Parser_Expr7Aux();
-		return new Expr7Aux(e1, e2);
+		return new Expr7Aux(e1, e2, getTokenName(minusSign));
 		break;
 	}
 	default:
@@ -890,21 +891,21 @@ Expr8Aux *Parser_Expr8Aux() {
 		eat(asterisk);
 		Expr9 *e1 = Parser_Expr9();
 		Expr8Aux *e2 = Parser_Expr8Aux();
-		return new Expr8Aux(e1, e2);
+		return new Expr8Aux(e1, e2, getTokenName(asterisk));
 		break;
 	}
 	case slash: {
 		eat(slash);
 		Expr9 *e1 = Parser_Expr9();
 		Expr8Aux *e2 = Parser_Expr8Aux();
-		return new Expr8Aux(e1, e2);
+		return new Expr8Aux(e1, e2, getTokenName(slash));
 		break;
 	}
 	case percent: {
 		eat(percent);
 		Expr9 *e1 = Parser_Expr9();
 		Expr8Aux *e2 = Parser_Expr8Aux();
-		return new Expr8Aux(e1, e2);
+		return new Expr8Aux(e1, e2, getTokenName(percent));
 		break;
 	}
 	default:

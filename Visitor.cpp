@@ -86,7 +86,7 @@ void Interpreter::visit(Program *n) {
 };
 
 void Interpreter::visit(FunctionOrVarDecl *n) {
-   // print("FUNCTIONORVARDECL");
+   print("FUNCTIONORVARDECL");
    lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->pointer != nullptr) n->pointer->accept(this);
@@ -97,26 +97,26 @@ void Interpreter::visit(FunctionOrVarDecl *n) {
 };
 
 void Interpreter::visit(ProgramL *n) {
-   // print("PROGRAML");
+   print("PROGRAML");
    lvl_next();
 
-   if(n->array != nullptr && n->idL != nullptr) {
-      n->array->accept(this);
-      n->idL->accept(this);
+   if(n->array != nullptr || n->idL != nullptr) {
+      if(n->array != nullptr) n->array->accept(this);
+      if(n->idL != nullptr) n->idL->accept(this);
    }
-   if(n->fl != nullptr && n->sl != nullptr) {
+   if(n->fl != nullptr || n->sl != nullptr) {
       print("(");
-      n->fl->accept(this);
+      if(n->fl != nullptr) n->fl->accept(this);
       print(")");
       print("{");
-      n->sl->accept(this);
+      if(n->sl != nullptr) n->sl->accept(this);
       print("}");
    }
    lvl_prev();
 }
 
 void Interpreter::visit(TypeDecl *n) {
-   //print("TYPEDECL"); 
+   print("TYPEDECL"); 
    lvl_next();
    // printf("%s", "typedef");
    print("typedef");
@@ -139,7 +139,7 @@ void Interpreter::visit(TypeDecl *n) {
 };
 
 void Interpreter::visit(VarDecl *n) {
-  //print("VARDECL");
+  print("VARDECL");
   lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->idl != nullptr) n->idl->accept(this);
@@ -181,20 +181,20 @@ void Interpreter::visit(Pointer *n) {
 };
 
 void Interpreter::visit(FormaList *n) {
-//   print("FORMALIST");
+  print("FORMALIST");
    lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->pointer != nullptr) n->pointer->accept(this);
    // printf("%s", "id");
    //print("id");
-   if(n->id != nullptr) n->id->accept(this);
+   if(n->i != nullptr) n->i->accept(this);
    if(n->array != nullptr) n->array->accept(this);
    if(n->fr != nullptr) n->fr->accept(this);
    lvl_prev();
 };
 
 void Interpreter::visit(FormalRest *n) {
-  //print("FORMALREST");
+  print("FORMALREST");
    lvl_next();
    // printf("%s", ",");
    print(",");
@@ -216,6 +216,7 @@ void Interpreter::visit(Array *n) {
 };
 
 void Interpreter::visit(IdList*n) {
+   print("IDLIST");
    if(n->pointer != nullptr) n->pointer->accept(this);
    if(n->id != nullptr) n->id->accept(this);
    if(n->array != nullptr) n->array->accept(this);
@@ -223,12 +224,13 @@ void Interpreter::visit(IdList*n) {
 }
 
 void Interpreter::visit(IdListAux *n) {
+   print("IDLISTAUX");
    print(",");
    if(n->il != nullptr) n->il->accept(this);
 };
 
 void Interpreter::visit(Stmtl *n) {
-//   print("STMTL");
+   print("STMTL");
    lvl_next();
    if(n->stmt != nullptr) n->stmt->accept(this);
    if(n->stmtl != nullptr) n->stmtl->accept(this);
@@ -301,7 +303,7 @@ void Interpreter::visit(Print *n) {
 };
 
 void Interpreter::visit(Readln *n) {
-  //print("READLN");
+   print("READLN");
    lvl_next();
    // printf("%s", "readln");
    print("readln");
@@ -371,7 +373,7 @@ void Interpreter::visit(If *n) {
 };
 
 void Interpreter::visit(StmtFatId *n) {
-//   print("STMTFATID");
+   print("STMTFATID");
    lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->fI != nullptr) n->fI->accept(this);
@@ -470,7 +472,7 @@ void Interpreter::visit(ExprListTail *n) {
 };
 
 void Interpreter::visit(ExprListTailAux *n) {
-   this->lvl_next();
+   lvl_next();
    // printf("%s", ",");
    print(",");
    if(n->elt != nullptr) n->elt->accept(this);
@@ -478,7 +480,7 @@ void Interpreter::visit(ExprListTailAux *n) {
 };
 
 void Interpreter::visit(Expr *n) {
-   // print("expr");
+   print("Expr");
    if(n->ex1 != nullptr) n->ex1->accept(this);
    // print("if1 expr");
    if(n->ex2 != nullptr) n->ex2->accept(this);
@@ -522,7 +524,7 @@ void Interpreter::visit(Expr5 *n) {
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
 void Interpreter::visit(Expr5Aux *n) {
-   print("==");
+   if(n->op != nullptr) print(n->op);
    if(n->ex1 != nullptr) n->ex1->accept(this);
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
@@ -531,7 +533,7 @@ void Interpreter::visit(Expr6 *n) {
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
 void Interpreter::visit(Expr6Aux *n) {
-   print("<");
+   if(n->op != nullptr) print(n->op);
    if(n->ex1 != nullptr) n->ex1->accept(this);
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
@@ -540,7 +542,7 @@ void Interpreter::visit(Expr7 *n) {
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
 void Interpreter::visit(Expr7Aux *n) {
-   print("+");
+   if(n->op != nullptr) print(n->op);
    if(n->ex1 != nullptr) n->ex1->accept(this);
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
@@ -549,7 +551,7 @@ void Interpreter::visit(Expr8 *n) {
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
 void Interpreter::visit(Expr8Aux *n) {
-   print("*");
+   if(n->op != nullptr) print(n->op);
    if(n->ex1 != nullptr) n->ex1->accept(this);
    if(n->ex2 != nullptr) n->ex2->accept(this);
 };
@@ -558,7 +560,7 @@ void Interpreter::visit(Expr9 *n) {
    if(n->e != nullptr) n->e->accept(this);
 };
 void Interpreter::visit(Expr9Aux *n) {
-   print("Unary");
+   if(n->op != nullptr) print(n->op);
    if(n->ex1 != nullptr) n->ex1->accept(this);
 };
 

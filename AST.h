@@ -133,9 +133,9 @@ class Pointer: public Node {
 
 class FormaList: public Node {
 	public:
-		Type * type; Pointer * pointer; Array * array; FormalRest *fr; Identifier *id;
-		FormaList(Type * t, Pointer * p, Array * a, FormalRest *f, Identifier *id) { 
-			type = t; pointer = p; array = a; fr = f; id = id;
+		Type * type; Pointer * pointer; Array * array; FormalRest *fr; Identifier *i;
+		FormaList(Type * t, Pointer * p, Array * a, FormalRest *f, Identifier *i) { 
+			type = t; pointer = p; array = a; fr = f; this->i = i;
 		};
 		void accept(Visitor *v);
 };
@@ -439,10 +439,11 @@ public:
 
 class Expr5Aux: public Node { 
 public: 
-	Expr6* ex1; Expr5Aux * ex2;
-	Expr5Aux(Expr6* e1, Expr5Aux * e2) { 
+	Expr6* ex1; Expr5Aux * ex2; const char *op;
+	Expr5Aux(Expr6* e1, Expr5Aux * e2, const char *op) { 
 		this->ex1 = e1;
 		this->ex2 = e2;
+		this->op = op;
 	};
 	void accept(Visitor *v);
 };
@@ -459,10 +460,11 @@ public:
 
 class Expr6Aux: public Node { 
 public: 
-	Expr7* ex1; Expr6Aux * ex2;
-	Expr6Aux(Expr7* e1, Expr6Aux * e2) { 
+	Expr7* ex1; Expr6Aux * ex2; const char *op;
+	Expr6Aux(Expr7* e1, Expr6Aux * e2, const char *op) { 
 		this->ex1 = e1;
 		this->ex2 = e2;
+		this->op = op;
 	};
 	void accept(Visitor *v);
 };
@@ -479,10 +481,11 @@ public:
 
 class Expr7Aux: public Node { 
 public: 
-	Expr8* ex1; Expr7Aux * ex2;
-	Expr7Aux(Expr8* e1, Expr7Aux * e2) { 
+	Expr8* ex1; Expr7Aux * ex2; const char *op;
+	Expr7Aux(Expr8 *e1, Expr7Aux *e2, const char *op) { 
 		this->ex1 = e1;
 		this->ex2 = e2;
+		this->op = op;
 	};
 	void accept(Visitor *v);
 };
@@ -499,10 +502,11 @@ public:
 
 class Expr8Aux: public Node { 
 public: 
-	Expr9* ex1; Expr8Aux * ex2;
-	Expr8Aux(Expr9* e1, Expr8Aux * e2) { 
+	Expr9* ex1; Expr8Aux * ex2; const char *op;
+	Expr8Aux(Expr9* e1, Expr8Aux * e2, const char *op) { 
 		this->ex1 = e1;
 		this->ex2 = e2;
+		this->op = op;
 	};
 	void accept(Visitor *v);
 };
@@ -518,11 +522,11 @@ public:
 
 class Expr9Aux: public Node { 
 public:
-	Expr9* ex1; const char *v;
+	Expr9* ex1; const char *op;
 	Expr9Aux() {};
-	Expr9Aux(Expr9* e, const char *v) {
+	Expr9Aux(Expr9* e, const char *op) {
 		this->ex1 = e;
-		this->v = v;
+		this->op = op;
 	};
 	void accept(Visitor *v);
 };

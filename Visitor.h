@@ -91,6 +91,12 @@ private:
       }
       printf("%s\n", s);
    };
+   void print(const char *s) {
+      for(int i=0; i<this->height; i++) {
+         printf(" ");
+      }
+      printf("%s\n", s);
+   };
    void print(int s) {
       for(int i=0; i<this->height; i++) {
          printf(" ");
