@@ -116,7 +116,7 @@ void Interpreter::visit(ProgramL *n) {
 }
 
 void Interpreter::visit(TypeDecl *n) {
-   print("TYPEDECL"); 
+   //print("TYPEDECL"); 
    lvl_next();
    // printf("%s", "typedef");
    print("typedef");
@@ -139,7 +139,7 @@ void Interpreter::visit(TypeDecl *n) {
 };
 
 void Interpreter::visit(VarDecl *n) {
-  print("VARDECL");
+  //print("VARDECL");
   lvl_next();
    if(n->type != nullptr) n->type->accept(this);
    if(n->idl != nullptr) n->idl->accept(this);
@@ -186,14 +186,15 @@ void Interpreter::visit(FormaList *n) {
    if(n->type != nullptr) n->type->accept(this);
    if(n->pointer != nullptr) n->pointer->accept(this);
    // printf("%s", "id");
-   print("id");
+   //print("id");
+   if(n->id != nullptr) n->id->accept(this);
    if(n->array != nullptr) n->array->accept(this);
    if(n->fr != nullptr) n->fr->accept(this);
    lvl_prev();
 };
 
 void Interpreter::visit(FormalRest *n) {
-  print("FORMALREST");
+  //print("FORMALREST");
    lvl_next();
    // printf("%s", ",");
    print(",");
@@ -272,7 +273,7 @@ void Interpreter::visit(Break *n) {
 };
 
 void Interpreter::visit(Braces *n) {
-  print("BRACES");
+   //print("BRACES");
    lvl_next();
    // printf("%s", "{");
    print("{");
@@ -285,7 +286,7 @@ void Interpreter::visit(Braces *n) {
 };
 
 void Interpreter::visit(Print *n) {
-  print("PRINT");
+  //print("PRINT");
    lvl_next();
    // printf("%s", "print");
    print("print");
@@ -300,7 +301,7 @@ void Interpreter::visit(Print *n) {
 };
 
 void Interpreter::visit(Readln *n) {
-  print("READLN");
+  //print("READLN");
    lvl_next();
    // printf("%s", "readln");
    print("readln");

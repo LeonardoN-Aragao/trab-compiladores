@@ -141,7 +141,7 @@ void advance() { token = nextToken(lex); }
 void eat(int t)
 {
     if (token == t) {
-        // printf("%s\n", getTokenName(token));
+        printf("%s\n", getTokenName(token));
         advance();
     }
     else
@@ -377,8 +377,11 @@ FormaList *Parser_FormaList()
     {
         Type *t = Parser_Type();
         Pointer *p = Parser_Pointer();
-        eat(identifier);
-        return new FormaList(t, p, Parser_Array(), Parser_FormalRest());
+        Identifier *id = Parser_identifier();
+        // eat(identifier);
+        Array *a = Parser_Array();
+        FormalRest *fr = Parser_FormalRest();
+        return new FormaList(t, p, a, fr, id);
     }
     else
         return NULL;
@@ -437,7 +440,7 @@ IdListAux *Parser_IdListAux()
 // StmtList -> ''
 Stmtl *Parser_StmtList()
 {
-    if (isStmt())
+    if (isStmt() || isType())
     {
         Stmt *s = Parser_Stmt();
         Stmtl *sl = Parser_StmtList();
@@ -501,9 +504,9 @@ Stmt *Parser_Stmt()
 
     case lbraces:
     {
-        eat(lbrackets);
+        eat(lbraces);
         Stmtl *sl = Parser_StmtList();
-        eat(rbrackets);
+        eat(rbraces);
         return new Braces(sl);
     }
     case print_:

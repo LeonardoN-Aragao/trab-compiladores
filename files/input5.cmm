@@ -1,9 +1,9 @@
-int main(int argc, char *argv){
-   double timespent = 0.0;
-   if (argc > 1)
-   {
-      fileName = argv[1];
-      sizet const size = strlen(fileName);
+int main(int argc, char *argv)
+{
+   double timespent;
+   while (argc > 1) {
+      fileName = argv;
+      sizet const size = strlen;
         /* novo comentario */
       if (fileName[size - 1] != 'm' && fileName[size - 2] != 'm' && fileName[size - 3] != 'c')
       {

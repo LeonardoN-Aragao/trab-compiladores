@@ -133,11 +133,10 @@ class Pointer: public Node {
 
 class FormaList: public Node {
 	public:
-		FormaList(
-			Type * t, Pointer * p, Array * a, FormalRest *f) { 
-				type = t; pointer = p; array = a; fr = f;
-		}
-		Type * type; Pointer * pointer; Array * array; FormalRest *fr; 
+		Type * type; Pointer * pointer; Array * array; FormalRest *fr; Identifier *id;
+		FormaList(Type * t, Pointer * p, Array * a, FormalRest *f, Identifier *id) { 
+			type = t; pointer = p; array = a; fr = f; id = id;
+		};
 		void accept(Visitor *v);
 };
 
