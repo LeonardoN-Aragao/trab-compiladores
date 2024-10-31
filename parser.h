@@ -1,0 +1,47 @@
+#include "lexic.h"
+#include "AST.h"
+
+Program *S();
+Program * parser(lexical * l);
+Program* Parser_Program();
+FunctionOrVarDecl* Parser_FunctionOrVarDecl();
+ProgramL * Parser_ProgramL();
+TypeDecl* Parser_TypeDecl();
+VarDecl* Parser_VarDecl();
+Type* Parser_Type();
+Pointer* Parser_Pointer();
+FormaList * Parser_FormaList();
+FormalRest * Parser_FormalRest();
+Array * Parser_Array();
+IdList * Parser_IdList();
+IdListAux * Parser_IdListAux();
+Stmtl * Parser_StmtList();
+Stmt * Parser_Stmt();
+Else* Parser_Else();
+FatId* Parser_FatId();
+FatId1* Parser_FatId1();
+CaseBlock * Parser_CaseBlock();
+ExprList * Parser_ExprList();
+ExprListTail * Parser_ExprListTail();
+ExprListTailAux * Parser_ExprListTailAux();
+Expr* Parser_Expr();
+ExprAux* Parser_ExprAux();
+Expr2* Parser_Expr2();
+Expr2Aux* Parser_Expr2Aux();
+Expr3* Parser_Expr3();
+Expr3Aux* Parser_Expr3Aux();
+Expr4* Parser_Expr4();
+Expr4Aux* Parser_Expr4Aux();
+Expr5* Parser_Expr5();
+Expr5Aux* Parser_Expr5Aux();
+Expr6* Parser_Expr6();
+Expr6Aux* Parser_Expr6Aux();
+Expr7* Parser_Expr7();
+Expr7Aux* Parser_Expr7Aux();
+Expr8* Parser_Expr8();
+Expr8Aux* Parser_Expr8Aux();
+Expr9* Parser_Expr9();
+Expr9Aux* Parser_Expr9Aux();
+F* Parser_F();
+Identifier *Parser_identifier();
+Num *Parser_Num();

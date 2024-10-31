@@ -1,0 +1,18 @@
+int teste;
+char* name;
+"Digite seu nome";
+"Meu nome e Juliana"
+switch (name)
+{
+case 0:
+   break;
+
+default:
+   break;
+}
+char m = 'm';
+
+while (true)
+{
+   printf("hello world \n");
+}
